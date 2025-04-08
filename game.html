@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="icon" href="logo.png" type="image/x-icon">
+<title>Драфт</title>
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background: url('background.png') no-repeat center center fixed;
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'Arial', sans-serif;
+    color: white;
+    position: relative;
+  }
+
+  body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+     background: rgba(30, 30, 30, 0.5);
+    z-index: -1;
+  }
+
+  .position-container {
+    display: flex;
+    flex-direction: column;
+    margin: 25px 0;
+    width: 90%;
+    max-width: 1000px;
+    background: linear-gradient(145deg, rgba(0,0,0,0.8), rgba(40,40,40,0.8));
+    padding: 20px;
+    border-radius: 15px;
+    border: 1px solid rgba(0, 191, 255, 0.2);
+    box-shadow: 0 0 15px rgba(0,0,0,0.5),
+               0 0 6px rgba(0, 191, 255, 0.1) inset;
+  }
+
+  .players-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 25px;
+    padding: 10px 0;
+  }
+
+  .player-circle {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    border: 2px solid #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    transform-style: preserve-3d;
+  }
+
+  .player-circle::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, 
+      transparent, 
+      rgba(255,255,255,0.1), 
+      transparent);
+    transform: rotate(45deg);
+    transition: 0.5s;
+    opacity: 0;
+  }
+
+  .player-circle:hover::before {
+    opacity: 1;
+    animation: playerShine 1.5s;
+  }
+
+  @keyframes playerShine {
+    0% { transform: translateX(-50%) rotate(45deg); }
+    100% { transform: translateX(150%) rotate(45deg); }
+  }
+
+  .player-rating {
+    font-size: 58px;
+    font-weight: 800;
+    color: white;
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.8);
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+  }
+
+  .player-nickname {
+    font-size: 14px;
+    font-weight: 500;
+    color: white;
+    position: absolute;
+    top: 70%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    text-align: center;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 5px;
+    z-index: 2;
+  }
+
+  .selected {
+    border-color: #00ff00;
+    box-shadow: 0 0 12px #00ff00,
+                0 0 20px rgba(0, 255, 0, 0.1);
+    transform: scale(1.06);
+  }
+
+  .bronze { background: linear-gradient(135deg, #cd7f32 0%, #a97142 100%); }
+  .silver { background: linear-gradient(135deg, #c0c0c0 0%, #909090 100%); }
+  .gold { background: linear-gradient(135deg, #ffd700 0%, #daa520 100%); }
+
+  #matchOverlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+  }
+
+  #matchPopup {
+    background: linear-gradient(145deg, #222, #1a1a1a);
+    padding: 20px;
+    border-radius: 15px;
+    width: 95%;
+    max-width: 700px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.6),
+                0 0 8px rgba(0, 191, 255, 0.15);
+    border: 1px solid rgba(0, 191, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+    box-sizing: border-box;
+
+}
+  }
+
+  .team-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 10px;
+  }
+
+  .team-logo {
+    width: 150px;
+    height: 150px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 8px rgba(0, 191, 255, 0.3));
+  }
+
+  .team-name-display {
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 8px;
+    color: #00bfff;
+    text-shadow: 0 0 6px rgba(0, 191, 255, 0.3);
+    white-space: nowrap;
+  }
+
+  #startButton {
+    display: none;
+    margin: 25px auto 0;
+    padding: 14px 35px;
+    font-size: 18px;
+    font-weight: 600;
+    background: linear-gradient(135deg, #0066cc, #00bfff);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    position: relative;
+    overflow: hidden;
+  }
+
+  #startButton::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255,255,255,0.12),
+      transparent
+    );
+    transition: 0.5s;
+  }
+
+  #startButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+  }
+
+  #startButton:hover::before {
+    left: 100%;
+  }
+
+  h2, h3 {
+    text-align: center;
+    margin: 0 0 20px;
+    color: #00bfff;
+    text-shadow: 0 0 10px rgba(0, 191, 255, 0.3);
+    font-size: 1.4em;
+  }
+
+  .vs-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 15px 0;
+    gap: 20px;
+    flex-wrap: nowrap;
+    width: 100%;
+  }
+
+  .score {
+    font-size: 28px;
+    font-weight: 800;
+    margin: 12px 0;
+    color: #fff;
+    text-align: center;
+    width: 100%;
+    text-shadow: 0 0 10px rgba(0, 191, 255, 0.5);
+  }
+
+  .final-banner {
+    background: linear-gradient(135deg, gold, #daa520);
+    color: #000;
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-weight: 700;
+    margin: 0 auto 15px;
+    width: fit-content;
+    box-shadow: 0 0 12px rgba(255,215,0,0.3);
+    font-size: 14px;
+  }
+
+  .match-time {
+    font-size: 16px;
+    font-weight: 500;
+    margin: 0 auto 10px;
+    text-align: center;
+    width: fit-content;
+    color: #00bfff;
+  }
+
+  #eventsContainer {
+    max-height: 118px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin: 1px 0;
+    padding-right: 5px;
+    width: calc(100% - 5px);
+  }
+
+  #eventsContainer::-webkit-scrollbar {
+    width: 5px;
+    background-color: rgba(0,0,0,0.25);
+    border-radius: 2px;
+  }
+
+  #eventsContainer::-webkit-scrollbar-thumb {
+    background-color: #00bfff;
+    border-radius: 2px;
+  }
+
+  .goal-event {
+    font-size: 13px;
+    margin: 2px 0;
+    padding: 4px 8px;
+    border-radius: 4px;
+    animation: goalFlash 0.8s;
+    background: rgba(0,0,0,0.25);
+    border-left: 3px solid;
+    line-height: 1.2;
+    min-height: 14px;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  .user-goal {
+    color: #7cfc00;
+    border-color: #7cfc00;
+    text-shadow: 0 0 4px rgba(124,252,0,0.25);
+  }
+
+  .opponent-goal {
+    color: #ff4500;
+    border-color: #ff4500;
+    text-shadow: 0 0 4px rgba(255,69,0,0.25);
+  }
+
+  @keyframes goalFlash {
+    0% { transform: scale(1.05); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .match-buttons-container {
+    margin-top: auto;
+    padding-top: 15px;
+  }
+
+  #playButton, #backToMenuButton {
+    padding: 12px 28px;
+    font-size: 16px;
+    font-weight: 600;
+    background: linear-gradient(135deg, #0066cc, #00bfff);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    display: block;
+    margin: 8px auto;
+    width: fit-content;
+  }
+
+  #playButton:hover, #backToMenuButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.25);
+  }
+
+  #statsOverlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.97);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(6px);
+  }
+
+  #statsPopup {
+    background: linear-gradient(145deg, #1a1a1a, #222);
+    padding: 20px;
+    border-radius: 15px;
+    width: 95%;
+    max-width: 600px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.6),
+                0 0 8px rgba(0, 191, 255, 0.15);
+    border: 1px solid rgba(0, 191, 255, 0.1);
+  }
+
+  .stats-title {
+    text-align: center;
+    font-size: 20px;
+    margin-bottom: 15px;
+    color: #00bfff;
+    text-shadow: 0 0 10px rgba(0, 191, 255, 0.3);
+  }
+
+  .stats-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 15px 0;
+  }
+
+  .stats-table th {
+    background: linear-gradient(135deg, #0066cc, #00bfff);
+    color: white;
+    padding: 10px;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .stats-table td {
+    padding: 8px 10px;
+    background: rgba(255,255,255,0.05);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-size: 13px;
+  }
+
+  .golden-ball {
+    text-align: center;
+    margin-top: 15px;
+    padding: 12px;
+    background: rgba(255,215,0,0.08);
+    border-radius: 12px;
+    border: 1px solid gold;
+    box-shadow: 0 0 8px rgba(255,215,0,0.25);
+  }
+
+  .golden-ball-icon {
+    font-size: 28px;
+    margin-bottom: 8px;
+    text-shadow: 0 0 12px gold;
+  }
+
+  #teamNameModal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 3000;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+
+  #teamNamePopup {
+    background: linear-gradient(145deg, #222, #1a1a1a);
+    padding: 20px;
+    border-radius: 15px;
+    width: 95%;
+    max-width: 450px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.6),
+                0 0 8px rgba(0, 191, 255, 0.15);
+    border: 1px solid rgba(0, 191, 255, 0.1);
+  }
+
+  #teamNameInput {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    margin: 12px 0;
+    border-radius: 6px;
+    border: 1px solid #00bfff;
+    background: rgba(0,0,0,0.4);
+    color: white;
+    text-align: center;
+    transition: all 0.3s;
+  }
+
+  #teamNameInput:focus {
+    outline: none;
+    box-shadow: 0 0 8px rgba(0, 191, 255, 0.2);
+  }
+
+  #confirmTeamName {
+    padding: 10px 25px;
+    font-size: 14px;
+    background: linear-gradient(135deg, #0066cc, #00bfff);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
+
+  #confirmTeamName:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 10px rgba(0,0,0,0.25);
+  }
+
+  .game-style-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 20px 0;
+  }
+
+  .style-button {
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    border: none;
+    border-radius: 18px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    background-size: 200% auto;
+  }
+
+  .style-button.defensive {
+    background: linear-gradient(135deg, #4CAF50, #2E8B57);
+  }
+
+  .style-button.balanced {
+    background: linear-gradient(135deg, #2196F3, #1E90FF);
+  }
+
+  .style-button.offensive {
+    background: linear-gradient(135deg, #f44336, #FF4500);
+  }
+
+  .style-button.selected {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(255,255,255,0.2),
+                0 4px 10px rgba(0,0,0,0.2);
+  }
+
+  .style-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 10px rgba(0,0,0,0.25);
+  }
+</style>
+</head>
+<body>
+
+<h2>Выберите состав команды</h2>
+
+<div class="position-container" id="gk-container">
+  <h3>Вратарь (GK)</h3>
+  <div class="players-row"></div>
+</div>
+
+<div class="position-container" id="cdm-container">
+  <h3>Опорный полузащитник (DM)</h3>
+  <div class="players-row"></div>
+</div>
+
+<div class="position-container" id="st-container">
+  <h3>Нападающий (ST)</h3>
+  <div class="players-row"></div>
+</div>
+
+<div class="position-container" id="cf-container">
+  <h3>Нападающий (ST)</h3>
+  <div class="players-row"></div>
+</div>
+
+<button id="startButton" onclick="showTeamNameModal()">Начать турнир</button>
+
+<!-- Модальное окно для ввода названия команды -->
+<div id="teamNameModal">
+  <div id="teamNamePopup">
+    <h3>Введите название вашей команды</h3>
+    <input type="text" id="teamNameInput" placeholder="Название команды" maxlength="20">
+    <button id="confirmTeamName" onclick="confirmTeamName()">Подтвердить</button>
+  </div>
+</div>
+
+<div id="matchOverlay">
+  <div id="matchPopup">
+    <div id="roundTitle"></div>
+    <div class="game-style-buttons">
+      <button class="style-button defensive" onclick="setGameStyle('defensive')">Оборонительный</button>
+      <button class="style-button balanced selected" onclick="setGameStyle('balanced')">Баланс</button>
+      <button class="style-button offensive" onclick="setGameStyle('offensive')">Атакующий</button>
+    </div>
+    <div class="vs-container">
+      <div style="display: flex; flex-direction: column; align-items: center;">
+        <div class="player-circle gold" style="margin-bottom: 25px;">
+          <div class="player-rating" id="userRatingDisplay"></div>
+          <div class="player-nickname">Ваша команда</div>
+        </div>
+        <div class="team-name-display" id="userTeamName"></div>
+      </div>
+      <span style="margin: 0 25px; font-size: 28px;">VS</span>
+      <div style="display: flex; flex-direction: column; align-items: center;">
+        <img id="opponentLogo" alt="Opponent" class="team-logo">
+        <div class="team-name-display" id="opponentName"></div>
+      </div>
+    </div>
+    <div id="matchTime" class="match-time">0:00</div>
+    <div id="scoreDisplay" class="score">0 : 0</div>
+    <div id="eventsContainer" style="min-height: 60px;"></div>
+    <p id="matchResult" style="margin: 25px 0; font-size: 20px;"></p>
+    <button id="playButton" onclick="playMatch()" style="padding: 12px 25px; font-size: 18px; background-color: #2196F3; color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.3s;">Играть матч</button>
+    <button id="backToMenuButton" onclick="backToMenu()">Вернуться в меню</button>
+  </div>
+</div>
+
+<div id="statsOverlay">
+  <div id="statsPopup">
+    <div class="stats-title">Статистика турнира</div>
+    <table class="stats-table" id="statsTable">
+      <thead>
+        <tr>
+          <th>Игрок</th>
+          <th>Голы</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <div id="goldenBallContainer"></div>
+    <button id="closeStatsButton" onclick="closeStats()" style="padding: 12px 25px; font-size: 18px; background-color: #2196F3; color: white; border: none; border-radius: 8px; cursor: pointer; transition: all 0.3s; margin-top: 20px; display: block; margin-left: auto; margin-right: auto;">Закрыть</button>
+  </div>
+</div>
+
+<script>
+  // Защита от открытия консоли
+  document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+  });
+  
+  document.addEventListener('keydown', function(e) {
+    // Блокировка F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U
+    if (e.key === 'F12' || 
+        (e.ctrlKey && e.shiftKey && e.key === 'I') || 
+        (e.ctrlKey && e.shiftKey && e.key === 'J') ||
+        (e.ctrlKey && e.shiftKey && e.key === 'C') ||
+        (e.ctrlKey && e.key === 'U')) {
+      e.preventDefault();
+    }
+  });
+  
+
+
+  const positions = {
+    GK: { 
+        container: document.getElementById('gk-container').querySelector('.players-row'), 
+        selected: null, 
+        players: [
+            { rating: 95, nickname: "Nsk" },
+            { rating: 91, nickname: "-nK" },
+            { rating: 88, nickname: "Савитар" },
+            { rating: 83, nickname: "ya tyanochka" },
+            { rating: 84, nickname: "Fade Away" },
+            { rating: 76, nickname: "diseased" },
+            { rating: 73, nickname: "drak" },
+            { rating: 65, nickname: "Nick" },
+            { rating: 59, nickname: "natsukasiy" },
+            { rating: 75, nickname: "Björn" },
+            { rating: 54, nickname: "pluto" },
+            { rating: 46, nickname: "Nagiev" },
+            { rating: 53, nickname: "oskasya" },
+            { rating: 55, nickname: "Sunex" },
+            { rating: 60, nickname: "lis" },
+            { rating: 88, nickname: "рагуль" },
+            { rating: 64, nickname: "LS" },
+            { rating: 65, nickname: "пиушка" },
+            { rating: 41, nickname: "NO_ON" },
+            { rating: 43, nickname: "Sky tempi" },
+        ]
+    },
+    CDM: { 
+        container: document.getElementById('cdm-container').querySelector('.players-row'), 
+        selected: null, 
+        players: [
+            { rating: 93, nickname: "Wenamka" },
+            { rating: 95, nickname: "Twistik" },
+            { rating: 91, nickname: "Murphy" },
+            { rating: 85, nickname: "koopinoff" },
+            { rating: 89, nickname: "yokk" },
+            { rating: 80, nickname: "шиммер" },
+            { rating: 76, nickname: "zark-" },
+            { rating: 65, nickname: "ottop" },
+            { rating: 70, nickname: "wool" },
+            { rating: 64, nickname: "Big boo" },
+            { rating: 53, nickname: "friend shiro" },
+            { rating: 52, nickname: "yeapez" },
+            { rating: 57, nickname: "DENRELAS" },
+            { rating: 55, nickname: "zxc" },
+            { rating: 57, nickname: "13setz" },
+            { rating: 90, nickname: "aero" },
+            { rating: 80, nickname: "IIIHA" },
+            { rating: 79, nickname: "boda" },
+            { rating: 61, nickname: "pure" },  
+            { rating: 54, nickname: "Scqxd" },      ]
+    },
+    ST: { 
+        container: document.getElementById('st-container').querySelector('.players-row'), 
+        selected: null, 
+        players: [
+            { rating: 95, nickname: "Kor" },
+            { rating: 91, nickname: "Filp" },
+            { rating: 89, nickname: "lopo" },
+            { rating: 81, nickname: "Tokito" },
+            { rating: 87, nickname: "златан" },
+            { rating: 77, nickname: "SUS" },
+            { rating: 79, nickname: "Kiw" },
+            { rating: 79, nickname: "Cyanide" },
+            { rating: 74, nickname: "Разберусь" },
+            { rating: 74, nickname: "Lean" },
+            { rating: 55, nickname: "Jora young" },
+            { rating: 53, nickname: "godmoves" },
+            { rating: 49, nickname: "Verty" },
+            { rating: 50, nickname: "fart" },
+            { rating: 53, nickname: "тихий парень" },
+            { rating: 89, nickname: "elox." },
+            { rating: 69, nickname: "Жмых" },
+            { rating: 63, nickname: "zvezzda" },
+            { rating: 58, nickname: "dark_pr1nce" },
+            { rating: 49, nickname: "rydii" },
+
+        ]
+    },
+    CF: { 
+        container: document.getElementById('cf-container').querySelector('.players-row'), 
+        selected: null, 
+        players: [
+            { rating: 92, nickname: "ninowka" },
+            { rating: 90, nickname: "step-" },
+            { rating: 95, nickname: "Pyro" },
+            { rating: 88, nickname: "iks" },
+            { rating: 83, nickname: "parma2013" },
+            { rating: 80, nickname: "Philip Brooks" },
+            { rating: 78, nickname: "sproty" },
+            { rating: 73, nickname: "berserk" },
+            { rating: 73, nickname: "iwd" },
+            { rating: 67, nickname: "Wilian31" },
+            { rating: 53, nickname: "Malasi" },
+            { rating: 54, nickname: "chesdes" },
+            { rating: 40, nickname: "ЯРЫЙ" },
+            { rating: 50, nickname: "Илуа" },
+            { rating: 40, nickname: "PenguinN10" },
+            { rating: 85, nickname: "Shepard" },
+            { rating: 60, nickname: "Guus" },
+            { rating: 60, nickname: "drakula" },
+            { rating: 54, nickname: "zaraki" },
+            { rating: 47, nickname: "holodok" },
+        ]
+    }
+};
+
+  const numPlayersToShow = 5;
+  const startButton = document.getElementById('startButton');
+
+  const opponentTeams = [
+    { name: "GreenLand", logo: "logo_GreenLand.png", rating: 67 },
+    { name: "KUMYS POWER", logo: "logo_KUMYS POWER.png", rating: 64 },
+    { name: "One more pass", logo: "logo_One more pass.png", rating: 64 },
+    { name: "IDM", logo: "logo_IDM.png", rating: 60 },
+    { name: "SHULC RS", logo: "logo_SHULC RS.png", rating: 55 },
+    { name: "FC United", logo: "logo_FC United.png", rating: 63 },
+    { name: "Karasuno", logo: "logo_Karasuno.png", rating: 58 },
+    { name: "The Last Dance", logo: "logo_The Last Dance.png", rating: 47 },
+    { name: "ХК Чертаново 2012", logo: "logo_ХК Чертаново 2012.png", rating: 50 },
+    { name: "Anubis", logo: "logo_Anubis.png", rating: 45 },
+
+    { name: "Bloodstream", logo: "logo_Bloodstream.png", rating: 57 },
+    { name: "Anji", logo: "logo_Anji.png", rating: 55 },
+    { name: "Оксидиум", logo: "logo_Оксидиум.png", rating: 50 },
+    { name: "Дети Солнца", logo: "logo_Дети Солнца.png", rating: 47 },
+    { name: "Хомяки", logo: "logo_Хомяки.png", rating: 45 },
+    { name: "Bolich", logo: "logo_Bolich.png", rating: 43 },
+    { name: "NoStuff", logo: "logo_NoStuff.png", rating: 44 },
+    { name: "Monkey Business", logo: "logo_Monkey Business.png", rating: 51 },
+    { name: "Everton", logo: "logo_Everton.png", rating: 40 },
+    { name: "Злые бобры", logo: "logo_Злые бобры.png", rating: 38 },
+
+    { name: "Water Heroes", logo: "logo_Water Heroes.png", rating: 40 },
+    { name: "Печенеги", logo: "logo_Печенеги.png", rating: 41 },
+    { name: "Братеки", logo: "logo_Братеки.png", rating: 34 },
+    { name: "HC Platina", logo: "logo_HC Platina.png", rating: 33 },
+    { name: "смеШАРики", logo: "logo_смеШАРики.png", rating: 31 },
+    { name: "FC Miami Mamoball", logo: "logo_FC Miami Mamoball.png", rating: 25 },
+    { name: "TikTok House", logo: "logo_TikTok House.png", rating: 22 },
+    { name: "Moon Lovers", logo: "logo_Moon Lovers.png", rating: 27 },
+    { name: "Поколение Чудес", logo: "logo_Поколение Чудес.png", rating: 20 },
+    { name: "edelweiss", logo: "logo_edelweiss.png", rating: 20 },
+];
+
+let currentRound = 32;
+let userTeamRating = 0;
+let currentOpponent = null;
+let matchInterval = null;
+let currentTime = 0;
+let userGoals = 0;
+let opponentGoals = 0;
+let goalEvents = [];
+let userTeamName = "Ваша команда";
+let usedOpponents = [];
+let tournamentWon = false;
+let scorers = {}; // Object to track player goals
+let gameStyle = 'balanced'; // По умолчанию баланс
+
+// Функция для установки стиля игры
+function setGameStyle(style) {
+    gameStyle = style;
+    // Обновляем визуальное выделение кнопок
+    document.querySelectorAll('.style-button').forEach(btn => {
+        btn.classList.remove('selected');
+    });
+    document.querySelector(`.style-button.${style}`).classList.add('selected');
+}
+
+// Функция для показа модального окна с вводом названия команды
+function showTeamNameModal() {
+    if (!checkAllSelected()) {
+        alert("Пожалуйста, выберите игроков на всех позициях!");
+        return;
+    }
+    document.getElementById('teamNameModal').style.display = 'flex';
+}
+
+// Функция для подтверждения названия команды
+function confirmTeamName() {
+    const nameInput = document.getElementById('teamNameInput');
+    if (nameInput.value.trim() === '') {
+        alert("Пожалуйста, введите название команды!");
+        return;
+    }
+    userTeamName = nameInput.value.trim();
+    document.getElementById('teamNameModal').style.display = 'none';
+    startTournament();
+}
+
+function backToMenu() {
+    window.location.href = "PLAY.html";
+}
+
+function getRandomScorer(position) {
+    if (position === "GK") {
+        // Шанс 1%, что вратарь забьет гол
+        if (Math.random() < 0.01) {
+            return positions[position].selected.nickname;
+        }
+        return null;
+    }
+    
+    const players = positions[position].players;
+    const activePlayers = players.filter(p => positions[position].selected && 
+        positions[position].selected.nickname === p.nickname);
+    
+    if (activePlayers.length > 0) {
+        return activePlayers[0].nickname;
+    }
+    
+    const availablePlayers = positions[position].players;
+    if (availablePlayers.length > 0) {
+        return availablePlayers[Math.floor(Math.random() * availablePlayers.length)].nickname;
+    }
+    return "Игрок";
+}
+
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+function getNextOpponent() {
+    const availableTeams = opponentTeams.filter(team => !usedOpponents.includes(team.name));
+    
+    if (availableTeams.length === 0) {
+        usedOpponents = [];
+        return opponentTeams[Math.floor(Math.random() * opponentTeams.length)];
+    }
+    
+    availableTeams.sort((a, b) => b.rating - a.rating);
+    
+    const weights = availableTeams.map((team, index) => {
+        const baseWeight = availableTeams.length - index;
+        const randomFactor = Math.random() * 3;
+        return baseWeight + randomFactor;
+    });
+    
+    const sumWeights = weights.reduce((a, b) => a + b, 0);
+    const normalizedWeights = weights.map(w => w / sumWeights);
+    
+    let random = Math.random();
+    let weightSum = 0;
+    for (let i = 0; i < availableTeams.length; i++) {
+        weightSum += normalizedWeights[i];
+        if (random <= weightSum) {
+            return availableTeams[i];
+        }
+    }
+    
+    return availableTeams[0];
+}
+
+function showPlayers(position) {
+    shuffleArray(positions[position].players);
+    positions[position].container.innerHTML = '';
+
+    for (let i = 0; i < numPlayersToShow; i++) {
+        if (!positions[position].players[i]) continue;
+        const playerData = positions[position].players[i];
+        
+        const playerWrapper = document.createElement('div');
+        playerWrapper.className = 'player-wrapper';
+        
+        const playerCircle = document.createElement('div');
+        playerCircle.className = 'player-circle';
+        playerCircle.dataset.rating = playerData.rating;
+        playerCircle.dataset.nickname = playerData.nickname;
+        
+        if (playerData.rating >= 40 && playerData.rating <= 60) {
+            playerCircle.classList.add('bronze');
+        } else if (playerData.rating >= 61 && playerData.rating <= 80) {
+            playerCircle.classList.add('silver');
+        } else if (playerData.rating >= 81 && playerData.rating <= 99) {
+            playerCircle.classList.add('gold');
+        }
+        
+        const ratingDiv = document.createElement('div');
+        ratingDiv.className = 'player-rating';
+        ratingDiv.textContent = playerData.rating;
+        
+        const nicknameDiv = document.createElement('div');
+        nicknameDiv.className = 'player-nickname';
+        nicknameDiv.textContent = playerData.nickname;
+        
+        playerCircle.appendChild(ratingDiv);
+        playerCircle.appendChild(nicknameDiv);
+        playerWrapper.appendChild(playerCircle);
+        
+        playerCircle.addEventListener('click', () => {
+            const allPlayers = positions[position].container.querySelectorAll('.player-circle');
+            allPlayers.forEach(p => p.classList.remove('selected'));
+            
+            playerCircle.classList.add('selected');
+            positions[position].selected = playerData;
+            
+            if (checkAllSelected()) {
+                startButton.style.display = 'block';
+            } else {
+                startButton.style.display = 'none';
+            }
+        });
+        
+        positions[position].container.appendChild(playerWrapper);
+    }
+}
+
+function checkAllSelected() {
+    for (const position in positions) {
+        if (!positions[position].selected) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function calculateUserTeamRating() {
+    let totalRating = 0;
+    let count = 0;
+    for (const position in positions) {
+        if (positions[position].selected) {
+            totalRating += positions[position].selected.rating;
+            count++;
+        }
+    }
+    return Math.round(totalRating / count);
+}
+
+function generateGoalEvents(userRating, opponentRating) {
+    const events = [];
+    const matchDuration = 16;
+    const ratingDifference = userRating - opponentRating;
+    
+    // Модификаторы в зависимости от стиля игры
+    let userGoalModifier = 1;
+    let opponentGoalModifier = 1;
+    
+    if (gameStyle === 'defensive') {
+        userGoalModifier = 0.5;
+        opponentGoalModifier = 0.5;
+    } else if (gameStyle === 'offensive') {
+        userGoalModifier = 2;
+        opponentGoalModifier = 2;
+    }
+    
+    const userGoalProbability = (0.4 + (0.5 * ratingDifference / 100) + (Math.random() * 0.2 - 0.1)) * userGoalModifier;
+    const opponentGoalProbability = (0.4 - (0.3 * ratingDifference / 100) + (Math.random() * 0.2 - 0.1)) * opponentGoalModifier;
+    
+    const totalGoals = Math.max(1, Math.min(10, 
+        Math.round((3 + (userRating + opponentRating) / 40 + (Math.random() * 4 - 2)) * (gameStyle === 'defensive' ? 0.5 : gameStyle === 'offensive' ? 2 : 1))));
+    
+    const goalTimes = [];
+    for (let i = 0; i < totalGoals; i++) {
+        goalTimes.push(Math.floor(Math.random() * matchDuration));
+    }
+    goalTimes.sort((a, b) => a - b);
+    
+    for (const time of goalTimes) {
+        const isUserGoal = Math.random() < userGoalProbability / (userGoalProbability + opponentGoalProbability);
+        let scorer = "";
+        
+        if (isUserGoal) {
+            // Шанс 1%, что гол забьет вратарь
+            if (Math.random() < 0.01 && positions.GK.selected) {
+                scorer = positions.GK.selected.nickname;
+            } else {
+                const scoringPositions = ["CDM", "ST", "CF"];
+                const randomPosition = scoringPositions[Math.floor(Math.random() * scoringPositions.length)];
+                scorer = getRandomScorer(randomPosition);
+            }
+        } else {
+            scorer = "Игрок";
+        }
+        
+        events.push({
+            time: time,
+            isUserGoal: isUserGoal,
+            scorer: scorer
+        });
+    }
+    
+    return events;
+}
+function showTournamentStats() {
+    const statsTable = document.querySelector('#statsTable tbody');
+    statsTable.innerHTML = '';
+    
+    // Convert scorers object to array and sort by goals
+    const scorersArray = Object.keys(scorers).map(name => ({
+        name: name,
+        goals: scorers[name]
+    })).sort((a, b) => b.goals - a.goals);
+    
+    // Display top scorers
+    scorersArray.forEach((scorer, index) => {
+        const row = document.createElement('tr');
+        
+        const nameCell = document.createElement('td');
+        nameCell.textContent = scorer.name;
+        row.appendChild(nameCell);
+        
+        const goalsCell = document.createElement('td');
+        goalsCell.textContent = scorer.goals;
+        row.appendChild(goalsCell);
+        
+        statsTable.appendChild(row);
+    });
+    
+    // Show golden ball if tournament was won
+    const goldenBallContainer = document.getElementById('goldenBallContainer');
+    goldenBallContainer.innerHTML = '';
+    
+    if (tournamentWon && scorersArray.length > 0) {
+        const topScorer = scorersArray[0];
+        const goldenBallDiv = document.createElement('div');
+        goldenBallDiv.className = 'golden-ball';
+        goldenBallDiv.innerHTML = `
+            <div class="golden-ball-icon">🏆</div>
+            <div>Золотой мяч турнира вручается ${topScorer.name} (${topScorer.goals} голов)</div>
+        `;
+        goldenBallContainer.appendChild(goldenBallDiv);
+    }
+    
+    document.getElementById('statsOverlay').style.display = 'flex';
+}
+
+function closeStats() {
+    document.getElementById('statsOverlay').style.display = 'none';
+}
+
+function simulateMatch() {
+    clearInterval(matchInterval);
+    document.getElementById('playButton').style.display = 'none';
+    document.getElementById('scoreDisplay').textContent = '0 : 0';
+    document.getElementById('eventsContainer').innerHTML = '';
+    
+    currentTime = 0;
+    userGoals = 0;
+    opponentGoals = 0;
+    goalEvents = generateGoalEvents(userTeamRating, currentOpponent.rating);
+    
+    matchInterval = setInterval(() => {
+        currentTime += 0.5;
+        const minutes = Math.floor(currentTime);
+        const seconds = currentTime % 1 === 0 ? '00' : '30';
+        
+        document.getElementById('matchTime').textContent = `${minutes}:${seconds}`;
+        
+        const currentEvents = goalEvents.filter(e => Math.floor(e.time) === minutes);
+        for (const event of currentEvents) {
+            if (event.isUserGoal) {
+                userGoals++;
+                const goalEvent = document.createElement('div');
+                goalEvent.className = 'goal-event user-goal';
+                goalEvent.textContent = `${minutes}:${seconds} ⚽ ГОЛ! ${event.scorer} забивает за вашу команду!`;
+                document.getElementById('eventsContainer').prepend(goalEvent);
+                
+                // Update scorers statistics only when goal is actually scored
+                if (event.scorer) {
+                    if (!scorers[event.scorer]) {
+                        scorers[event.scorer] = 0;
+                    }
+                    scorers[event.scorer]++;
+                }
+            } else {
+                opponentGoals++;
+                const goalEvent = document.createElement('div');
+                goalEvent.className = 'goal-event opponent-goal';
+                goalEvent.textContent = `${minutes}:${seconds} ⚽ ГОЛ! ${event.scorer} забивает за ${currentOpponent.name}!`;
+                document.getElementById('eventsContainer').prepend(goalEvent);
+            }
+            document.getElementById('scoreDisplay').textContent = `${userGoals} : ${opponentGoals}`;
+        }
+        
+        if (currentTime >= 16) {
+            clearInterval(matchInterval);
+            finishMatch();
+        }
+    }, 531.25);
+}
+
+function finishMatch() {
+    document.getElementById('playButton').style.display = 'block';
+    document.getElementById('backToMenuButton').style.display = 'block';
+    
+    if (userGoals > opponentGoals) {
+        document.getElementById('matchResult').textContent = "Вы победили!";
+        currentRound /= 2;
+        if (currentRound >= 1) {
+            setTimeout(nextMatch, 4000);
+        } else {
+            tournamentWon = true;
+            document.getElementById('matchResult').textContent = "🏆 Поздравляем! Вы выиграли турнир! 🏆";
+            document.getElementById("playButton").style.display = "none";
+            setTimeout(showTournamentStats, 3000);
+        }
+    } else if (userGoals < opponentGoals) {
+        document.getElementById('matchResult').textContent = "Вы проиграли! Турнир окончен.";
+        document.getElementById("playButton").style.display = "none";
+        setTimeout(showTournamentStats, 3000);
+    } else {
+        document.getElementById('matchResult').textContent = "Ничья! Дополнительное время...";
+        setTimeout(() => {
+            const winner = Math.random() < 0.5 ? "user" : "opponent";
+            if (winner === "user") {
+                document.getElementById('matchResult').textContent = "Вы победили в дополнительное время!";
+                currentRound /= 2;
+                if (currentRound >= 1) {
+                    setTimeout(nextMatch, 4000);
+                } else {
+                    tournamentWon = true;
+                    document.getElementById('matchResult').textContent = "🏆 Поздравляем! Вы выиграли турнир! 🏆";
+                    document.getElementById("playButton").style.display = "none";
+                    setTimeout(showTournamentStats, 3000);
+                }
+            } else {
+                document.getElementById('matchResult').textContent = "Вы проиграли в дополнительное время!";
+                document.getElementById("playButton").style.display = "none";
+                setTimeout(showTournamentStats, 3000);
+            }
+        }, 2000);
+    }
+}
+
+function playMatch() {
+    document.getElementById('backToMenuButton').style.display = 'none';
+    simulateMatch();
+}
+
+function nextMatch() {
+    currentOpponent = getNextOpponent();
+    usedOpponents.push(currentOpponent.name);
+    
+    document.getElementById('opponentLogo').src = currentOpponent.logo;
+    document.getElementById('opponentName').textContent = currentOpponent.name;
+    
+    const roundTitle = document.getElementById('roundTitle');
+    if (currentRound === 1) {
+        roundTitle.innerHTML = '<div class="final-banner">ФИНАЛ</div>';
+    } else {
+        roundTitle.innerHTML = `<h3>1/${currentRound} финала</h3>`;
+    }
+    
+    document.getElementById('scoreDisplay').textContent = '0 : 0';
+    document.getElementById('matchResult').textContent = '';
+    document.getElementById('matchTime').textContent = '0:00';
+    document.getElementById('eventsContainer').innerHTML = '';
+    document.getElementById('backToMenuButton').style.display = 'none';
+}
+
+function startTournament() {
+    // Reset statistics for new tournament
+    scorers = {};
+    tournamentWon = false;
+    
+    userTeamRating = calculateUserTeamRating();
+    currentRound = 256;
+    usedOpponents = [];
+    document.getElementById('matchOverlay').style.display = 'flex';
+    document.getElementById('matchResult').textContent = '';
+    document.getElementById('playButton').style.display = 'block';
+    document.getElementById('userRatingDisplay').textContent = userTeamRating;
+    document.getElementById('userTeamName').textContent = userTeamName;
+    document.getElementById('backToMenuButton').style.display = 'none';
+    nextMatch();
+}
+
+window.onload = function() {
+    for (const position in positions) {
+        showPlayers(position);
+    }
+};
+</script>
+
+</body>
+</html>
