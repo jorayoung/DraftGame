@@ -106,7 +106,7 @@
   }
 
   .player-nickname {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 500;
     color: white;
     position: absolute;
@@ -522,7 +522,7 @@
 
   .style-button.selected {
     transform: scale(1.05);
-    box-shadow: 0 0 10px rgba(255,255,255,0.2),
+    box-shadow: 0 0 15px rgba(255,255,255,0.3),
                 0 4px 10px rgba(0,0,0,0.2);
   }
 
@@ -530,6 +530,91 @@
     transform: translateY(-2px);
     box-shadow: 0 6px 10px rgba(0,0,0,0.25);
   }
+
+#transferOverlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 1500;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+}
+
+#transferPopup {
+    background: linear-gradient(145deg, #222, #1a1a1a);
+    padding: 20px;
+    border-radius: 15px;
+    width: 95%;
+    max-width: 700px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.6),
+                0 0 8px rgba(0, 191, 255, 0.15);
+    border: 1px solid rgba(0, 191, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.transfer-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #00bfff;
+    text-shadow: 0 0 10px rgba(0, 191, 255, 0.3);
+    text-align: center;
+}
+
+.transfer-players {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin: 20px 0;
+}
+
+.transfer-player {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 45%;
+}
+
+.transfer-player-title {
+    font-size: 16px;
+    margin-bottom: 10px;
+    color: white;
+    text-align: center;
+}
+
+.transfer-buttons {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.transfer-button {
+    padding: 12px 25px;
+    font-size: 16px;
+    font-weight: 600;
+    background: linear-gradient(135deg, #0066cc, #00bfff);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.transfer-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.25);
+}
+
+.transfer-button.reject {
+    background: linear-gradient(135deg, #cc3300, #ff4500);
+}
 </style>
 </head>
 <body>
@@ -615,6 +700,32 @@
   </div>
 </div>
 
+<div id="transferOverlay">
+    <div id="transferPopup">
+        <div class="transfer-title">Предложение на трансфер</div>
+        <div class="transfer-players">
+            <div class="transfer-player">
+                <div class="transfer-player-title">Ваш текущий игрок</div>
+                <div id="currentPlayer" class="player-circle gold">
+                    <div class="player-rating">75</div>
+                    <div class="player-nickname">Игрок</div>
+                </div>
+            </div>
+            <div class="transfer-player">
+                <div class="transfer-player-title">Предлагаемый игрок</div>
+                <div id="offeredPlayer" class="player-circle gold">
+                    <div class="player-rating">80</div>
+                    <div class="player-nickname">Игрок</div>
+                </div>
+            </div>
+        </div>
+        <div class="transfer-buttons">
+            <button class="transfer-button" onclick="acceptTransfer()">Обменять</button>
+            <button class="transfer-button reject" onclick="rejectTransfer()">Отказать</button>
+        </div>
+    </div>
+</div>
+
 <script>
   // Защита от открытия консоли
   document.addEventListener('contextmenu', function(e) {
@@ -659,6 +770,14 @@
             { rating: 65, nickname: "пиушка" },
             { rating: 41, nickname: "NO_ON" },
             { rating: 43, nickname: "Sky tempi" },
+            { rating: 54, nickname: "Мама Вонти" },
+            { rating: 56, nickname: "UCHIHAS" },
+            { rating: 42, nickname: "denji-" },
+            { rating: 54, nickname: "yowai" },
+            { rating: 76, nickname: "Yoze" },
+            { rating: 56, nickname: "servi" },
+            { rating: 54, nickname: "Василий_Шат." },
+            { rating: 64, nickname: "Yedlin" },
         ]
     },
     CDM: { 
@@ -684,7 +803,16 @@
             { rating: 80, nickname: "IIIHA" },
             { rating: 79, nickname: "boda" },
             { rating: 61, nickname: "pure" },  
-            { rating: 54, nickname: "Scqxd" },      ]
+            { rating: 54, nickname: "Scqxd" },
+            { rating: 85, nickname: "adriano" }, 
+            { rating: 90, nickname: "Solence" }, 
+            { rating: 72, nickname: "Impo" }, 
+            { rating: 52, nickname: "Jakov" }, 
+            { rating: 63, nickname: "MaSsik" }, 
+            { rating: 51, nickname: "чпек" }, 
+            { rating: 57, nickname: "Candy" }, 
+            { rating: 79, nickname: "Emkay" }, 
+      ]
     },
     ST: { 
         container: document.getElementById('st-container').querySelector('.players-row'), 
@@ -710,6 +838,14 @@
             { rating: 63, nickname: "zvezzda" },
             { rating: 58, nickname: "dark_pr1nce" },
             { rating: 49, nickname: "rydii" },
+            { rating: 69, nickname: "Timoxa196" },
+            { rating: 81, nickname: "leT1m" },
+            { rating: 60, nickname: "deko" },
+            { rating: 49, nickname: "Nagi" },
+            { rating: 67, nickname: "Волька" },
+            { rating: 59, nickname: "буся" },
+            { rating: 66, nickname: "iRaJ-" },
+
 
         ]
     },
@@ -737,6 +873,13 @@
             { rating: 60, nickname: "drakula" },
             { rating: 54, nickname: "zaraki" },
             { rating: 47, nickname: "holodok" },
+            { rating: 52, nickname: "Chex" },
+            { rating: 60, nickname: "butterfly" },
+            { rating: 76, nickname: "Eazw" },
+            { rating: 50, nickname: "flourgame" },
+            { rating: 67, nickname: "Yapo" },
+            { rating: 49, nickname: "Данис" },
+            { rating: 91, nickname: "aMp" },
         ]
     }
 };
@@ -755,7 +898,6 @@
     { name: "The Last Dance", logo: "logo_The Last Dance.png", rating: 47 },
     { name: "ХК Чертаново 2012", logo: "logo_ХК Чертаново 2012.png", rating: 50 },
     { name: "Anubis", logo: "logo_Anubis.png", rating: 45 },
-
     { name: "Bloodstream", logo: "logo_Bloodstream.png", rating: 57 },
     { name: "Anji", logo: "logo_Anji.png", rating: 55 },
     { name: "Оксидиум", logo: "logo_Оксидиум.png", rating: 50 },
@@ -766,7 +908,6 @@
     { name: "Monkey Business", logo: "logo_Monkey Business.png", rating: 51 },
     { name: "Everton", logo: "logo_Everton.png", rating: 40 },
     { name: "Злые бобры", logo: "logo_Злые бобры.png", rating: 38 },
-
     { name: "Water Heroes", logo: "logo_Water Heroes.png", rating: 40 },
     { name: "Печенеги", logo: "logo_Печенеги.png", rating: 41 },
     { name: "Братеки", logo: "logo_Братеки.png", rating: 34 },
@@ -777,6 +918,18 @@
     { name: "Moon Lovers", logo: "logo_Moon Lovers.png", rating: 27 },
     { name: "Поколение Чудес", logo: "logo_Поколение Чудес.png", rating: 20 },
     { name: "edelweiss", logo: "logo_edelweiss.png", rating: 20 },
+
+    { name: "AS Tatarstan", logo: "logo_AS Tatarstan.png", rating: 65 },
+    { name: "Medvjedi", logo: "logo_Medvjedi.png", rating: 64 },
+    { name: "SkyRed", logo: "logo_SkyRed.png", rating: 33 },
+    { name: "Вечерние звезды", logo: "logo_Вечерние звезды.png", rating: 50 },
+    { name: "Bounty", logo: "logo_Bounty.png", rating: 40 },
+    { name: "The Beatles", logo: "logo_The Beatles.png", rating: 38 },
+    { name: "FC6", logo: "logo_FC6.png", rating: 18 },
+    { name: "Томь", logo: "logo_Томь.png", rating: 19 },
+    { name: "Yokohama City", logo: "logo_Yokohama City.png", rating: 40 },
+    { name: "Metallurg", logo: "logo_Metallurg.png", rating: 44 },
+
 ];
 
 let currentRound = 32;
@@ -983,11 +1136,10 @@ function generateGoalEvents(userRating, opponentRating) {
         opponentGoalModifier = 2;
     }
     
-    const userGoalProbability = (0.4 + (0.5 * ratingDifference / 100) + (Math.random() * 0.2 - 0.1)) * userGoalModifier;
-    const opponentGoalProbability = (0.4 - (0.3 * ratingDifference / 100) + (Math.random() * 0.2 - 0.1)) * opponentGoalModifier;
+    const userGoalProbability = (0.4 + (0.5 * ratingDifference / 100) + (Math.random() * 0.17 - 0.085)) * userGoalModifier;
+    const opponentGoalProbability = (0.4 - (0.3 * ratingDifference / 100) + (Math.random() * 0.17 - 0.085)) * opponentGoalModifier;
     
-    const totalGoals = Math.max(1, Math.min(10, 
-        Math.round((3 + (userRating + opponentRating) / 40 + (Math.random() * 4 - 2)) * (gameStyle === 'defensive' ? 0.5 : gameStyle === 'offensive' ? 2 : 1))));
+    const totalGoals = Math.max(1, Math.min(10, Math.round((3 + (userRating + opponentRating)/40 + (Math.random() * 3.4 - 1.7)) * (gameStyle === 'defensive' ? 0.5 : gameStyle === 'offensive' ? 2 : 1))));
     
     const goalTimes = [];
     for (let i = 0; i < totalGoals; i++) {
@@ -1124,16 +1276,21 @@ function finishMatch() {
     document.getElementById('backToMenuButton').style.display = 'block';
     
     if (userGoals > opponentGoals) {
-        document.getElementById('matchResult').textContent = "Вы победили!";
-        currentRound /= 2;
-        if (currentRound >= 1) {
-            setTimeout(nextMatch, 4000);
+    document.getElementById('matchResult').textContent = "Вы победили!";
+    currentRound /= 2;
+    if (currentRound >= 1) {
+        // Show transfer offer after 1/64 round после 1/64
+        if (currentRound === 32) {
+            setTimeout(showTransferOffer, 2000);
         } else {
-            tournamentWon = true;
-            document.getElementById('matchResult').textContent = "🏆 Поздравляем! Вы выиграли турнир! 🏆";
-            document.getElementById("playButton").style.display = "none";
-            setTimeout(showTournamentStats, 3000);
+            setTimeout(nextMatch, 2000);
         }
+    } else {
+        tournamentWon = true;
+        document.getElementById('matchResult').textContent = "🏆 Поздравляем! Вы выиграли турнир! 🏆";
+        document.getElementById("playButton").style.display = "none";
+        setTimeout(showTournamentStats, 3000);
+    }
     } else if (userGoals < opponentGoals) {
         document.getElementById('matchResult').textContent = "Вы проиграли! Турнир окончен.";
         document.getElementById("playButton").style.display = "none";
@@ -1210,6 +1367,105 @@ window.onload = function() {
         showPlayers(position);
     }
 };
+
+// Transfer Offer Functions
+function showTransferOffer() {
+    // Find the weakest player in the team
+    let weakestPlayer = null;
+    let weakestRating = 100;
+    let weakestPosition = null;
+    
+    for (const position in positions) {
+        if (positions[position].selected && positions[position].selected.rating < weakestRating) {
+            weakestRating = positions[position].selected.rating;
+            weakestPlayer = positions[position].selected;
+            weakestPosition = position;
+        }
+    }
+    
+    if (!weakestPlayer || !weakestPosition) return;
+    
+    // Find a random player from the same position with higher rating
+    const availablePlayers = positions[weakestPosition].players.filter(
+        p => p.rating > weakestRating && p.nickname !== weakestPlayer.nickname
+    );
+    
+    if (availablePlayers.length === 0) return;
+    
+    const offeredPlayer = availablePlayers[Math.floor(Math.random() * availablePlayers.length)];
+    
+    // Update transfer modal UI
+    const currentPlayerCircle = document.getElementById('currentPlayer');
+    currentPlayerCircle.querySelector('.player-rating').textContent = weakestPlayer.rating;
+    currentPlayerCircle.querySelector('.player-nickname').textContent = weakestPlayer.nickname;
+    
+    const offeredPlayerCircle = document.getElementById('offeredPlayer');
+    offeredPlayerCircle.querySelector('.player-rating').textContent = offeredPlayer.rating;
+    offeredPlayerCircle.querySelector('.player-nickname').textContent = offeredPlayer.nickname;
+    
+    // Set rating class
+    [currentPlayerCircle, offeredPlayerCircle].forEach(circle => {
+        circle.className = 'player-circle';
+        const rating = parseInt(circle.querySelector('.player-rating').textContent);
+        if (rating >= 40 && rating <= 60) {
+            circle.classList.add('bronze');
+        } else if (rating >= 61 && rating <= 80) {
+            circle.classList.add('silver');
+        } else if (rating >= 81 && rating <= 99) {
+            circle.classList.add('gold');
+        }
+    });
+    
+    // Store transfer data
+    currentPlayerCircle.dataset.position = weakestPosition;
+    currentPlayerCircle.dataset.nickname = weakestPlayer.nickname;
+    offeredPlayerCircle.dataset.position = weakestPosition;
+    offeredPlayerCircle.dataset.nickname = offeredPlayer.nickname;
+    offeredPlayerCircle.dataset.rating = offeredPlayer.rating;
+    
+    // Show transfer modal
+    document.getElementById('transferOverlay').style.display = 'flex';
+}
+
+function acceptTransfer() {
+    const currentPlayerCircle = document.getElementById('currentPlayer');
+    const offeredPlayerCircle = document.getElementById('offeredPlayer');
+    
+    const position = currentPlayerCircle.dataset.position;
+    const oldNickname = currentPlayerCircle.dataset.nickname;
+    const newNickname = offeredPlayerCircle.dataset.nickname;
+    const newRating = parseInt(offeredPlayerCircle.dataset.rating);
+    
+    // Find the offered player data
+    const offeredPlayer = positions[position].players.find(p => p.nickname === newNickname);
+    
+    if (offeredPlayer) {
+        // Удаляем статистику старого игрока (не переносим её новому)
+        if (scorers[oldNickname]) {
+            delete scorers[oldNickname];
+        }
+        
+        // Начинаем статистику нового игрока с нуля
+        scorers[newNickname] = 0;
+        
+        // Update selected player
+        positions[position].selected = offeredPlayer;
+        
+        // Update team rating
+        userTeamRating = calculateUserTeamRating();
+        document.getElementById('userRatingDisplay').textContent = userTeamRating;
+    }
+    
+    // Close transfer modal and continue tournament
+    document.getElementById('transferOverlay').style.display = 'none';
+    nextMatch();
+}
+
+function rejectTransfer() {
+    // Just close transfer modal and continue tournament
+    document.getElementById('transferOverlay').style.display = 'none';
+    nextMatch();
+}
 </script>
 
 </body>
