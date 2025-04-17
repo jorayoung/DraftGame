@@ -738,9 +738,348 @@
     background-color: #00bfff;
     border-radius: 2px;
 }
+
+.balance-display {
+    position: fixed;
+    top: 8px;
+    right: 100px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #7cfc00;
+    text-shadow: 0 0 8px rgba(124, 252, 0, 0.5);
+    background: rgba(0, 0, 0, 0.7);
+    padding: 8px 15px;
+    border-radius: 15px;
+    z-index: 9999; /* Максимальный приоритет */
+    pointer-events: none;
+    transition: all 0.3s;
+}
+
+.add-player-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px dashed #00bfff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: #00bfff;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.add-player-btn:hover {
+    background: rgba(0, 191, 255, 0.2);
+    transform: scale(1.1);
+}
+
+#sellOverlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 2500;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+}
+
+#sellPopup {
+    background: linear-gradient(145deg, #222, #1a1a1a);
+    padding: 25px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.sell-buttons {
+    margin-top: 20px;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.sell-button {
+    padding: 10px 25px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.sell-button.confirm {
+    background: linear-gradient(135deg, #4CAF50, #2E8B57);
+    color: white;
+}
+
+.sell-button.cancel {
+    background: linear-gradient(135deg, #f44336, #FF4500);
+    color: white;
+}
+
+/* Стили для рынка */
+#marketOverlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 3000;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+}
+
+#marketPopup {
+    background: linear-gradient(145deg, #222, #1a1a1a);
+    padding: 20px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 700px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 20px rgba(0,0,0,0.6);
+    overflow: hidden; /* Добавлено */
+}
+
+
+.market-title {
+    font-size: 24px;
+    color: #00bfff;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+#marketPlayers {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow-y: auto; /* Добавлено */
+    flex: 1; /* Добавлено */
+    padding-right: 8px; /* Добавлено */
+    margin-bottom: 15px; /* Добавлено */
+}
+
+#marketPlayers::-webkit-scrollbar {
+    width: 6px;
+    background-color: rgba(0,0,0,0.3);
+}
+
+#marketPlayers::-webkit-scrollbar-thumb {
+    background-color: #00bfff;
+    border-radius: 3px;
+}
+
+.market-player {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    min-height: 50px;
+    background: rgba(0, 191, 255, 0.05); /* Добавлено */
+    border-radius: 8px; /* Добавлено */
+    transition: background 0.3s; /* Добавлено */
+}
+
+.market-player:hover {
+    background: rgba(0, 191, 255, 0.1); /* Обновлено */
+}
+
+.player-price {
+    color: #7cfc00;
+    font-weight: bold;
+    margin-left: 15px;
+}
+
+#confirmPurchase {
+    background: linear-gradient(135deg, #4CAF50, #2E8B57);
+    margin-top: 15px;
+}
+
+.market-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    align-items: center;
+    justify-content: center;
+    z-index: 3100;
+}
+
+.market-popup {
+    background: linear-gradient(145deg, #222, #1a1a1a);
+    padding: 25px;
+    border-radius: 15px;
+    text-align: center;
+    width: 90%;
+    max-width: 400px;
+}
+
+.player-info {
+    margin: 20px 0;
+    font-size: 18px;
+}
+
+.market-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.market-button {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.market-button.confirm {
+    background: linear-gradient(135deg, #4CAF50, #2E8B57);
+    color: white;
+}
+
+.market-button.cancel {
+    background: linear-gradient(135deg, #f44336, #FF4500);
+    color: white;
+}
+
+/* Добавьте в CSS */
+.add-player-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* В секции market-player стили */
+.market-player .player-rating {
+    position: static !important;
+    font-size: 16px !important;
+    transform: none !important;
+    color: #00bfff;
+    text-shadow: none;
+    margin-left: 10px;
+}
+
+.market-player .player-nickname {
+    position: static !important;
+    transform: none !important;
+    white-space: normal;
+    font-size: 14px;
+    max-width: 120px;
+    text-overflow: clip;
+}
+
+#salaryOverlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 4000;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+}
+
+#salaryPopup {
+    background: linear-gradient(145deg, #222, #1a1a1a);
+    padding: 25px;
+    border-radius: 15px;
+    text-align: center;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.6);
+}
+
+/* Добавьте в секцию style */
+@keyframes balanceBlink {
+    0% { color: #7cfc00; text-shadow: 0 0 8px rgba(124,252,0,0.5); }
+    50% { color: #00ff00; text-shadow: 0 0 15px #00ff00; transform: scale(1.1); }
+    100% { color: #7cfc00; text-shadow: 0 0 8px rgba(124,252,0,0.5); }
+}
+
+.balance-blink {
+    animation: balanceBlink 0.8s ease-in-out;
+}
+
+@keyframes millionBlink {
+    0% { opacity: 0; transform: translate(-50%,-50%) scale(0.5); }
+    20% { opacity: 1; transform: translate(-50%,-50%) scale(1.5); }
+    40% { transform: translate(-50%,-50%) scale(0.9); }
+    60% { transform: translate(-50%,-50%) scale(1.2); }
+    100% { opacity: 0; transform: translate(-50%,-50%) scale(1.5); }
+}
+
+#sponsorOverlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 5000;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+  }
+
+  #sponsorPopup {
+    background: linear-gradient(145deg, #1a3a1a, #2d522d);
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 0 20px rgba(0,255,0,0.3);
+    border: 2px solid #00ff00;
+  }
+
+  .sponsor-amount {
+    font-size: 32px;
+    color: #7cfc00;
+    text-shadow: 0 0 15px #00ff00;
+    margin: 20px 0;
+    animation: amountGlow 1.5s ease-in-out infinite;
+  }
+
+  @keyframes amountGlow {
+    0% { opacity: 0.8; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.05); }
+    100% { opacity: 0.8; transform: scale(1); }
+  }
+
+/* Добавить в секцию стилей */
+#penaltyPopup {
+  animation: penaltyGlow 1.5s ease-in-out infinite;
+}
+
+@keyframes penaltyGlow {
+  0% { box-shadow: 0 0 15px rgba(255,0,0,0.3); }
+  50% { box-shadow: 0 0 25px rgba(255,0,0,0.5); }
+  100% { box-shadow: 0 0 15px rgba(255,0,0,0.3); }
+}
 </style>
 </head>
 <body>
+<audio id="tapSound" src="tap.mp3"></audio>
 <h2>Выберите состав команды</h2>
 
 <div class="position-container" id="gk-container">
@@ -773,6 +1112,8 @@
     <button id="confirmTeamName" onclick="confirmTeamName()">Подтвердить</button>
   </div>
 </div>
+
+<div id="balanceDisplay" class="balance-display">Баланс: 25 000 000 ₽</div>
 
 <div id="matchOverlay">
   <div id="matchPopup">
@@ -872,6 +1213,71 @@
   </div>
 </div>
 
+<div id="sellOverlay">
+    <div id="sellPopup">
+        <h3 id="sellTitle"></h3>
+        <div class="sell-buttons">
+            <button class="sell-button confirm" onclick="confirmSell()">Продать</button>
+            <button class="sell-button cancel" onclick="cancelSell()">Отмена</button>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно рынка -->
+<div id="marketOverlay">
+    <div id="marketPopup">
+        <div class="market-title" id="marketTitle">Рынок игроков</div>
+        <div id="marketPlayers"></div>
+        <button class="transfer-button" onclick="closeMarket()">Назад</button>
+    </div>
+</div>
+
+<!-- Модальное окно подтверждения покупки -->
+<div id="purchaseOverlay" class="market-overlay">
+    <div id="purchasePopup" class="market-popup">
+        <h3 id="purchaseTitle"></h3>
+        <div class="player-info">
+            <span id="playerPrice"></span>
+        </div>
+        <div class="market-buttons">
+            <button class="market-button confirm" onclick="confirmPurchase()">Купить</button>
+            <button class="market-button cancel" onclick="closePurchase()">Назад</button>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно требования зарплаты -->
+<div id="salaryOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 4000; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
+    <div id="salaryPopup" style="background: linear-gradient(145deg, #222, #1a1a1a); padding: 30px; border-radius: 15px; text-align: center; width: 90%; max-width: 400px;">
+        <h3 id="salaryTitle"></h3>
+        <div id="salaryAmount" style="font-size: 24px; margin: 20px 0; color: #ff4444;"></div>
+        <div class="market-buttons">
+            <button class="market-button confirm" onclick="paySalary()">Оплатить</button>
+        </div>
+    </div>
+</div>
+<div id="millionAnimation" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); z-index: 10000; pointer-events: none; font-size: 40px; color: gold; text-shadow: 0 0 20px yellow; animation: millionBlink 1.5s ease-out;">
+    +600 000 ₽
+</div>
+
+
+<div id="sponsorOverlay">
+  <div id="sponsorPopup">
+    <h3>Ваш спонсор выделил бюджет команде!</h3>
+    <div class="sponsor-amount" id="sponsorAmount"></div>
+    <button class="market-button confirm" onclick="closeSponsorMenu()">Продолжить</button>
+  </div>
+</div>
+
+<!-- Добавить в тело HTML после других оверлеев -->
+<div id="penaltyOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 6000; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
+  <div id="penaltyPopup" style="background: linear-gradient(145deg, #2a1a1a, #3a1a1a); padding: 30px; border-radius: 15px; text-align: center; width: 90%; max-width: 400px; box-shadow: 0 0 20px rgba(255,0,0,0.3); border: 2px solid #ff4444;">
+    <h2 style="color: #ff4444; margin-bottom: 15px;">Штраф</h2>
+    <h3 id="penaltyReason" style="margin-bottom: 20px;"></h3>
+    <div style="font-size: 24px; margin-bottom: 25px;">1 000 000 ₽</div>
+    <button onclick="handlePenaltyPayment()" style="padding: 12px 25px; font-size: 16px; background: linear-gradient(135deg, #cc0000, #ff4444); color: white; border: none; border-radius: 25px; cursor: pointer; transition: all 0.3s;">Оплатить</button>
+  </div>
+</div>
 <script>
   // Защита от открытия консоли
   document.addEventListener('contextmenu', function(e) {
@@ -934,6 +1340,16 @@
             { rating: 50, nickname: "Клаудиньо" },
             { rating: 48, nickname: "Yorho" },
             { rating: 50, nickname: "Avis" },
+            { rating: 41, nickname: "Zметана" },
+            { rating: 49, nickname: "aster" },
+            { rating: 52, nickname: "Аустролопитек" },
+            { rating: 44, nickname: "marcelo." },
+            { rating: 49, nickname: "Neonit" },
+            { rating: 44, nickname: "дыня" },
+            { rating: 75, nickname: "Фругер" },
+            { rating: 55, nickname: "Kifla" },
+            { rating: 48, nickname: "b⁸" },
+            { rating: 50, nickname: "bonusbuychik" },
         ]
     },
     CDM: { 
@@ -978,6 +1394,16 @@
             { rating: 85, nickname: "soul" },
             { rating: 52, nickname: "Shtrembl" },
             { rating: 45, nickname: "ʀʜᴇɪɴᴍᴇᴛᴀʟ" },
+            { rating: 56, nickname: "alyosha" },
+            { rating: 57, nickname: "alery" },
+            { rating: 49, nickname: "PPL217" },
+            { rating: 40, nickname: "FoLneZ" },
+            { rating: 83, nickname: "laamb" },
+            { rating: 50, nickname: "exportdefault" },
+            { rating: 52, nickname: "Abramov" },
+            { rating: 61, nickname: "бульбаш" },
+            { rating: 56, nickname: "kc" },
+            { rating: 53, nickname: "𝖪𝗈𝗌𝗈𝖻𝖾𝗋" },
       ]
     },
     ST: { 
@@ -1021,6 +1447,16 @@
             { rating: 40, nickname: "MR. LUKA" },
             { rating: 40, nickname: "plxdy" },
             { rating: 42, nickname: "yupix" },
+            { rating: 44, nickname: "dance tiger" },
+            { rating: 58, nickname: "niko" },
+            { rating: 46, nickname: "BONYA" },
+            { rating: 51, nickname: "Falluntg" },
+            { rating: 55, nickname: "tr1gand" },
+            { rating: 56, nickname: "Metro Boomin" },
+            { rating: 66, nickname: "kidaiblock" },
+            { rating: 63, nickname: "велосипедистка ленка" },
+            { rating: 58, nickname: "лизон СОСИсон" },
+            { rating: 61, nickname: "Def" },
 
         ]
     },
@@ -1065,6 +1501,16 @@
             { rating: 92, nickname: "Levaldo" },
             { rating: 50, nickname: "GRENKA" },
             { rating: 44, nickname: "Faya (ы)" },
+            { rating: 51, nickname: "Hex" },
+            { rating: 43, nickname: "S1lan4ik" },
+            { rating: 50, nickname: "korv1" },
+            { rating: 80, nickname: "Yamakasi" },
+            { rating: 55, nickname: "карпен" },
+            { rating: 59, nickname: "krizzen" },
+            { rating: 62, nickname: "jz" },
+            { rating: 63, nickname: "cdG" },
+            { rating: 60, nickname: "Glöw" },
+            { rating: 59, nickname: "dj sex" },
         ]
     }
 };
@@ -1123,7 +1569,6 @@
     { name: "Interment", logo: "logo_Interment.png", rating: 20 },
     { name: "Internet Heroes", logo: "logo_Internet Heroes.png", rating: 30 },
     { name: "TMNT", logo: "logo_TMNT.png", rating: 40 },
-
     { name: "FEAR", logo: "logo_FEAR.png", rating: 65 },
     { name: "Flyin' Škrtels", logo: "logo_Fly.png", rating: 65 },
     { name: "Ghouls", logo: "logo_Ghouls.png", rating: 45 },
@@ -1134,6 +1579,51 @@
     { name: "HC Glass", logo: "logo_HC Glass.png", rating: 40 },
     { name: "Karabah", logo: "logo_Karabah.png", rating: 20 },
     { name: "Шайка-04", logo: "logo_Шайка-04.png", rating: 37 },
+    { name: "HC Pussy Squad", logo: "logo_HC Pussy Squad.png", rating: 58 },
+    { name: "Joga Bonito", logo: "logo_Joga Bonito.png", rating: 60 },
+    { name: "Bastard München", logo: "logo_Bastard Munchen.png", rating: 60 },
+    { name: "qwerty", logo: "logo_qwerty.png", rating: 61 },
+    { name: "Excalibur", logo: "logo_Excalibur.png", rating: 58 },
+    { name: "Warriors", logo: "logo_Warriors.png", rating: 59 },
+    { name: "Бей-Беги", logo: "logo_Бей-Беги.png", rating: 55 },
+    { name: "HC Florida", logo: "logo_HC Florida.png", rating: 57 },
+    { name: "Orgasm Nostradamus", logo: "logo_Orgasm Nostradamus.png", rating: 60 },
+    { name: "AKATSUKI.DFA.UA", logo: "logo_AKATSUKIDFAUA.png", rating: 60 },
+    { name: "Spitfire Team", logo: "logo_Spitfire Team.png", rating: 65 },
+    { name: "Гомофобы", logo: "logo_Гомофобы.png", rating: 43 },
+    { name: "Black Leopards", logo: "logo_Black Leopards.png", rating: 40 },
+    { name: "квадрат", logo: "logo_квадрат.png", rating: 46 },
+    { name: "Team Clasha", logo: "logo_Team Clasha.png", rating: 45 },
+    { name: "Team Slaves", logo: "logo_Team Slaves.png", rating: 38 },
+    { name: "FLHAX.FUN -hat", logo: "logo_FLHAXFUN -hat.png", rating: 40 },
+    { name: "Battletoads", logo: "logo_Battletoads.png", rating: 45 },
+    { name: "EXE", logo: "logo_EXE.png", rating: 40 },
+    { name: "FC United-2", logo: "logo_FC United-2.png", rating: 40 },
+    { name: "Тончайшие Механизмы", logo: "logo_Тончайшие Механизмы.png", rating: 40 },
+    { name: "Сборная Двача", logo: "logo_Сборная Двача.png", rating: 38 },
+    { name: "malinaboys", logo: "logo_malinaboys.png", rating: 48 },
+    { name: "Rebel Boxes", logo: "logo_Rebel Boxes.png", rating: 46 },
+    { name: "Seattle", logo: "logo_Seattle.png", rating: 45 },
+    { name: "HC Orlando Pirates", logo: "logo_HC Orlando Pirates.png", rating: 39 },
+    { name: "Team Stefan", logo: "logo_Team Stefan.png", rating: 30 },
+    { name: "FC Living Stars", logo: "logo_FC Living Stars.png", rating: 27 },
+    { name: "ХК Чертаново 2013", logo: "logo_ХК Чертаново 2013.png", rating: 22 },
+    { name: "Vision Sun", logo: "logo_Vision Sun.png", rating: 23 },
+    { name: "POLET", logo: "logo_POLET.png", rating: 20 },
+    { name: "Turbo Dribblers", logo: "logo_Turbo Dribblers.png", rating: 20 },
+    { name: "Vegestore", logo: "logo_Vegestore.png", rating: 20 },
+    { name: "PAOK", logo: "logo_PAOK.png", rating: 22 },
+    { name: "WOF UNITED", logo: "logo_WOF UNITED.png", rating: 25 },
+    { name: "FC United Academy", logo: "logo_FC United Academy.png", rating: 38 },
+    { name: "HaxMill City-2", logo: "logo_HaxMill City-2.png", rating: 20 },
+    { name: "Persik Squad", logo: "logo_Persik Squad.png", rating: 8 },
+    { name: "GoodCape", logo: "logo_GoodCape.png", rating: 12 },
+    { name: "Bayer 04 Haxball", logo: "logo_Bayer 04 Haxball.png", rating: 10 },
+    { name: "EXTRAPOLATION 140", logo: "logo_EXTRAPOLATION 140.png", rating: 55 },
+    { name: "WE PLAY AFTER SCHOOL", logo: "logo_WE PLAY AFTER SCHOOL.png", rating: 55 },
+    { name: "КБ", logo: "logo_КБ.png", rating: 40 },
+    { name: "FLASP YOUNGSTERS", logo: "logo_FLASP YOUNGSTERS.png", rating: 40 },
+    { name: "HC Sleepy Souls", logo: "logo_HC Sleepy Souls.png", rating: 25 },
 
 ];
 
@@ -1146,6 +1636,10 @@ let currentTime = 0;
 let userGoals = 0;
 let opponentGoals = 0;
 let goalEvents = [];
+let isMatchActive = false; // Добавьте в начало раздела с переменными
+let isOvertime = false;
+let balance = Math.floor(Math.random() * (27500000 - 1000000 + 1)) + 1000000;
+let currentSellingPlayer = null;
 let userTeamName = "Ваша команда";
 let usedOpponents = [];
 let scorers = {}; // Object to track player goals
@@ -1311,12 +1805,23 @@ function showPlayers(position) {
 }
 
 function checkAllSelected() {
+    let allSelected = true;
     for (const position in positions) {
         if (!positions[position].selected) {
-            return false;
+            allSelected = false;
+            break;
         }
     }
-    return true;
+    
+    // Блокировать кнопку старта матча
+    const startBtn = document.getElementById('playButton');
+    if (startBtn) {
+        startBtn.disabled = !allSelected;
+        startBtn.style.opacity = allSelected ? 1 : 0.5;
+        startBtn.style.cursor = allSelected ? 'pointer' : 'not-allowed';
+    }
+    
+    return allSelected;
 }
 
 function calculateUserTeamRating() {
@@ -1433,6 +1938,7 @@ function closeStats() {
 }
 
 function simulateMatch() {
+    isMatchActive = true; // Добавьте эту строку
     // Скрываем кнопки при старте матча
     document.getElementById('playButton').style.display = 'none';
     document.getElementById('backToMenuButton').style.display = 'none';
@@ -1497,6 +2003,8 @@ function simulateMatch() {
 }
 
 function finishMatch() {
+    isMatchActive = false;
+    isOvertime = false; // Добавить сброс флага
     // Скрываем кнопки перед дополнительным временем
     document.getElementById('playButton').style.display = 'none';
     document.getElementById('backToMenuButton').style.display = 'none';
@@ -1521,6 +2029,7 @@ function finishMatch() {
 }
 
 function playExtraTime(duration) {
+    isOvertime = true; // Устанавливаем флаг овертайма
     // Скрываем кнопки в начале дополнительного времени
     document.getElementById('playButton').style.display = 'none';
     document.getElementById('backToMenuButton').style.display = 'none';
@@ -1576,7 +2085,8 @@ function playExtraTime(duration) {
         
         // Проверяем окончание дополнительного времени
         if (extraTimePassed >= duration) {
-            clearInterval(extraTimeInterval);
+        clearInterval(extraTimeInterval);
+        isOvertime = false; // Сбрасываем флаг
             
             // Добавляем сообщение о завершении дополнительного времени
             const endMsg = document.createElement('div');
@@ -1606,11 +2116,23 @@ function playExtraTime(duration) {
 }
 
 function determineMatchOutcome() {
+    isOvertime = false; // Сбросить флаг при любом исходе
+    updateMarketPlayersRatings();
     // Показываем кнопки после завершения матча
     document.getElementById('playButton').style.display = 'block';
     document.getElementById('backToMenuButton').style.display = 'block';
 
     if (userGoals > opponentGoals) {
+        // Начисляем 600 000 за победу
+balance += 600000;
+const animElement = document.getElementById('millionAnimation');
+animElement.style.display = 'block';
+setTimeout(() => animElement.style.display = 'none', 1500);
+
+const balanceElement = document.getElementById('balanceDisplay');
+balanceElement.textContent = `Баланс: ${balance.toLocaleString()} ₽`;
+balanceElement.classList.add('balance-blink');
+        setTimeout(() => balanceElement.classList.remove('balance-blink'), 800);
         // Логика победы
         document.getElementById('matchResult').textContent = "Вы победили!";
         
@@ -1678,6 +2200,11 @@ function determineMatchOutcome() {
             setTimeout(showTournamentStats, 1000);
         }
     }
+setTimeout(() => {
+  checkSponsorBonus();
+  triggerSalaryRequest();
+  checkForPenalty(); // Добавить эту строку
+}, 1000);
 }
 
 // Новая функция для генерации событий в дополнительное время
@@ -1798,6 +2325,8 @@ window.onload = function() {
     for (const position in positions) {
         showPlayers(position);
     }
+    document.getElementById('balanceDisplay').textContent = 
+        `Баланс: ${balance.toLocaleString()} ₽`;
 };
 
 // Transfer Offer Functions
@@ -1843,16 +2372,18 @@ function showTransferOffer() {
     
     // Set rating class
     [currentPlayerCircle, offeredPlayerCircle].forEach(circle => {
-        circle.className = 'player-circle';
-        const rating = parseInt(circle.querySelector('.player-rating').textContent);
-        if (rating >= 40 && rating <= 60) {
-            circle.classList.add('bronze');
-        } else if (rating >= 61 && rating <= 80) {
-            circle.classList.add('silver');
-        } else if (rating >= 81 && rating <= 99) {
-            circle.classList.add('gold');
-        }
-    });
+    circle.className = 'player-circle';
+    const rating = parseInt(circle.querySelector('.player-rating').textContent);
+    if (rating >= 40 && rating <= 60) {
+        circle.classList.add('bronze');
+    } else if (rating >= 61 && rating <= 80) {
+        circle.classList.add('silver');
+    } else if (rating >= 81 && rating <= 99) {
+        circle.classList.add('gold');
+    } else if (rating >= 100) { // Добавляем условие для красного класса
+        circle.classList.add('red');
+    }
+});
     
     // Store transfer data
     currentPlayerCircle.dataset.position = weakestPosition;
@@ -2331,14 +2862,15 @@ function updateTeamSquadDisplay() {
     squadContainer.innerHTML = '';
     
     for (const position in positions) {
+        const playerWrapper = document.createElement('div');
+        playerWrapper.className = 'squad-player';
+        
         if (positions[position].selected) {
             const player = positions[position].selected;
             
-            const playerWrapper = document.createElement('div');
-            playerWrapper.className = 'squad-player';
-            
             const playerCircle = document.createElement('div');
             playerCircle.className = 'squad-player-circle';
+            playerCircle.style.cursor = 'pointer';
             
             // Добавляем класс цвета в зависимости от рейтинга
             if (player.rating >= 40 && player.rating <= 60) {
@@ -2364,7 +2896,22 @@ function updateTeamSquadDisplay() {
             playerWrapper.appendChild(nicknameDiv);
             
             squadContainer.appendChild(playerWrapper);
+       
+// Добавьте обработчик клика
+            playerCircle.addEventListener('click', () => showSellMenu(position, player));
+        } else {
+            const addButton = document.createElement('div');
+            addButton.className = 'add-player-btn';
+            addButton.innerHTML = '+';
+            addButton.onclick = () => openMarket(position);
+            addButton.className = 'add-player-btn' + (isMatchActive ? ' disabled' : '');
+    if (!isMatchActive) {
+        addButton.onclick = () => openMarket(position);
+    }
+            playerWrapper.appendChild(addButton);
         }
+        
+        squadContainer.appendChild(playerWrapper);
     }
 }
 
@@ -2394,6 +2941,337 @@ function updateTopScorersDisplay() {
     }
     
     scorersDisplay.innerHTML = html;
+}
+
+document.addEventListener('mousedown', function(event) {
+            if (event.button === 0) { // Проверка левой кнопки
+                const sound = document.getElementById('tapSound');
+                sound.currentTime = 0; // Перемотка на начало
+                sound.play(); // Воспроизведение
+            }
+        });
+function showSellMenu(position, player) {
+    if (isMatchActive || isOvertime) { // Добавить проверку на овертайм
+        alert("Нельзя продавать игроков во время матча!");
+        return;
+    }
+    currentSellingPlayer = { position, player };
+    const sellPrice = Math.pow(player.rating, 4);
+    document.getElementById('sellTitle').textContent = 
+        `Продать ${player.nickname} (${player.rating}) за ${sellPrice.toLocaleString()} ₽?`;
+    document.getElementById('sellOverlay').style.display = 'flex';
+}
+
+function confirmSell() {
+    if (!currentSellingPlayer) return;
+    
+    const { position, player } = currentSellingPlayer;
+    const sellPrice = Math.pow(player.rating, 4);
+    
+    balance += sellPrice;
+    document.getElementById('balanceDisplay').textContent = 
+        `Баланс: ${balance.toLocaleString()} ₽`;
+    
+    // Удалить игрока
+    positions[position].selected = null;
+    updateTeamSquadDisplay();
+    checkAllSelected();
+    
+    // Обновить рейтинг команды
+    userTeamRating = calculateUserTeamRating();
+    document.getElementById('userRatingDisplay').textContent = userTeamRating;
+    updateTeamRatingCircle();
+    
+    cancelSell();
+}
+
+function cancelSell() {
+    currentSellingPlayer = null;
+    document.getElementById('sellOverlay').style.display = 'none';
+}
+
+let currentMarketPosition = null;
+let selectedMarketPlayer = null;
+
+function openMarket(position) {
+    if (isMatchActive) {
+        alert("Нельзя покупать игроков во время матча!");
+        return;
+    }
+    currentMarketPosition = position;
+    document.getElementById('marketTitle').textContent = `Рынок ${position}`;
+    loadMarketPlayers(position);
+    document.getElementById('marketOverlay').style.display = 'flex';
+}
+
+function loadMarketPlayers(position) {
+    const container = document.getElementById('marketPlayers');
+    container.innerHTML = '';
+    
+    // Обновляем классы игроков согласно новому рейтингу
+    positions[position].players.forEach(player => {
+        if (player.rating >= 40 && player.rating <= 60) {
+            player.class = 'bronze';
+        } else if (player.rating >= 61 && player.rating <= 80) {
+            player.class = 'silver';
+        } else if (player.rating >= 81) {
+            player.class = 'gold';
+        }
+    });
+    
+    // Фильтруем игроков по позиции и сортируем по рейтингу
+    const players = positions[position].players
+        .filter(p => !isPlayerInTeam(p.nickname))
+        .sort((a, b) => b.rating - a.rating);
+    
+    players.forEach(player => {
+        const playerDiv = document.createElement('div');
+        playerDiv.className = 'market-player';
+        playerDiv.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="display: flex; flex-direction: column;">
+                <span class="player-nickname">${player.nickname}</span>
+                <span class="player-rating" style="font-size: 12px;">Рейтинг: ${player.rating}</span>
+            </div>
+        </div>
+        <div class="player-price">${Math.pow(player.rating, 4).toLocaleString()} ₽</div>
+    `;
+        
+        playerDiv.addEventListener('click', () => showPurchaseDialog(player));
+        container.appendChild(playerDiv);
+    });
+}
+
+function isPlayerInTeam(nickname) {
+    return Object.values(positions).some(pos => 
+        pos.selected && pos.selected.nickname === nickname
+    );
+}
+
+function showPurchaseDialog(player) {
+    selectedMarketPlayer = player;
+    const price = Math.pow(player.rating, 4);
+    
+    document.getElementById('purchaseTitle').textContent = 
+        `Купить ${player.nickname} (${player.rating})?`;
+    document.getElementById('playerPrice').textContent = 
+        `Цена: ${price.toLocaleString()} ₽`;
+    
+    document.getElementById('marketOverlay').style.display = 'none';
+    document.getElementById('purchaseOverlay').style.display = 'flex';
+}
+
+function confirmPurchase() {
+    const price = Math.pow(selectedMarketPlayer.rating, 4);
+    
+    if (balance >= price) {
+        balance -= price;
+        positions[currentMarketPosition].selected = selectedMarketPlayer;
+        
+        // Обновляем рейтинг команды
+        userTeamRating = calculateUserTeamRating();
+        document.getElementById('userRatingDisplay').textContent = userTeamRating;
+        updateTeamRatingCircle();
+        
+        updateTeamSquadDisplay();
+        checkAllSelected();
+        
+        document.getElementById('balanceDisplay').textContent = 
+            `Баланс: ${balance.toLocaleString()} ₽`;
+        
+        closePurchase();
+        closeMarket();
+    } else {
+        alert('Недостаточно средств!');
+    }
+}
+
+function closePurchase() {
+    document.getElementById('purchaseOverlay').style.display = 'none';
+    document.getElementById('marketOverlay').style.display = 'flex';
+}
+
+function closeMarket() {
+    document.getElementById('marketOverlay').style.display = 'none';
+    selectedMarketPlayer = null;
+    currentMarketPosition = null;
+}
+
+function triggerSalaryRequest() {
+    // Получаем всех выбранных игроков
+    const teamPlayers = [];
+    for (const position in positions) {
+        if (positions[position].selected) {
+            teamPlayers.push({
+                position: position,
+                player: positions[position].selected
+            });
+        }
+    }
+    
+    if (teamPlayers.length === 0) return;
+    
+    // Выбираем случайного игрока
+    const randomPlayer = teamPlayers[Math.floor(Math.random() * teamPlayers.length)];
+    const salary = Math.pow(randomPlayer.player.rating, 3);
+    
+    // Сохраняем данные для обработки
+    window.currentSalaryRequest = {
+        position: randomPlayer.position,
+        player: randomPlayer.player,
+        salary: salary
+    };
+    
+    // Показываем модальное окно
+    document.getElementById('salaryTitle').textContent = 
+        `${randomPlayer.player.nickname} требует зарплату!`;
+    document.getElementById('salaryAmount').textContent = 
+        `${salary.toLocaleString()} ₽`;
+    document.getElementById('salaryOverlay').style.display = 'flex';
+}
+
+function paySalary() {
+    const request = window.currentSalaryRequest;
+    if (!request) return;
+    
+    if (balance >= request.salary) {
+        // Оплачиваем зарплату
+        balance -= request.salary;
+        document.getElementById('balanceDisplay').textContent = 
+            `Баланс: ${balance.toLocaleString()} ₽`;
+    } else {
+        // Игрок уходит
+        positions[request.position].selected = null;
+        updateTeamSquadDisplay();
+        checkAllSelected();
+        userTeamRating = calculateUserTeamRating();
+        document.getElementById('userRatingDisplay').textContent = userTeamRating;
+        alert(`${request.player.nickname} ушел из команды из-за неуплаты!`);
+    }
+    
+    // Закрываем окно и продолжаем игру
+    document.getElementById('salaryOverlay').style.display = 'none';
+    window.currentSalaryRequest = null;
+    
+
+}
+
+function showOverlay(overlayId) {
+    document.getElementById(overlayId).style.zIndex = 9000; // Меньше чем у анимации
+    document.getElementById(overlayId).style.display = 'flex';
+}
+
+function checkSponsorBonus() {
+  if (Math.random() < 0.05) { // 5% шанс
+    const amount = Math.floor(Math.random() * (30000000 - 1000000 + 1) + 1000000);
+    showSponsorMenu(amount);
+  }
+}
+
+function showSponsorMenu(amount) {
+  balance += amount;
+  document.getElementById('sponsorAmount').textContent = 
+    `${amount.toLocaleString()} ₽`;
+  document.getElementById('sponsorOverlay').style.display = 'flex';
+  
+  // Анимация баланса
+  const balanceElement = document.getElementById('balanceDisplay');
+  balanceElement.textContent = `Баланс: ${balance.toLocaleString()} ₽`;
+  balanceElement.classList.add('balance-blink');
+  setTimeout(() => balanceElement.classList.remove('balance-blink'), 800);
+}
+
+function closeSponsorMenu() {
+  document.getElementById('sponsorOverlay').style.display = 'none';
+}
+
+function checkForPenalty() {
+  if (Math.random() < 0.06) { // 6% шанс
+    showPenalty();
+  }
+}
+
+function showPenalty() {
+  const reasons = [
+    "За неспортивное поведение вашего игрока!",
+    "Ваши болельщики навели беспредел!",
+    "За оскорбительное высказывание в интервью!"
+  ];
+  
+  document.getElementById('penaltyReason').textContent = reasons[Math.floor(Math.random() * reasons.length)];
+  document.getElementById('penaltyOverlay').style.display = 'flex';
+}
+
+function handlePenaltyPayment() {
+  const penaltyAmount = 1000000;
+  
+  if (balance >= penaltyAmount) {
+    balance -= penaltyAmount;
+    updateBalanceDisplay();
+    document.getElementById('penaltyOverlay').style.display = 'none';
+  } else {
+    if (!sellPlayerToCoverPenalty(penaltyAmount)) {
+      alert("Невозможно оплатить штраф! Продажа игроков не помогла.");
+    }
+    document.getElementById('penaltyOverlay').style.display = 'none';
+  }
+}
+
+function sellPlayerToCoverPenalty(amountNeeded) {
+  let totalSold = 0;
+  const positionsOrder = ['CF', 'ST', 'CDM', 'GK']; // Приоритет продажи
+  
+  for (const position of positionsOrder) {
+    if (positions[position].selected) {
+      const player = positions[position].selected;
+      const sellValue = Math.pow(player.rating, 4);
+      
+      // Продаем игрока
+      balance += sellValue;
+      totalSold += sellValue;
+      positions[position].selected = null;
+      
+      // Обновляем интерфейс
+      updateTeamSquadDisplay();
+      checkAllSelected();
+      userTeamRating = calculateUserTeamRating();
+      updateTeamRatingCircle();
+      updateBalanceDisplay();
+      
+      // Проверяем достаточно ли средств
+      if (totalSold >= amountNeeded) {
+        balance -= amountNeeded; // Вычитаем штраф
+        updateBalanceDisplay();
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+function updateBalanceDisplay() {
+  const balanceElement = document.getElementById('balanceDisplay');
+  balanceElement.textContent = `Баланс: ${balance.toLocaleString()} ₽`;
+  balanceElement.classList.add('balance-blink');
+  setTimeout(() => balanceElement.classList.remove('balance-blink'), 800);
+}
+
+function updateMarketPlayersRatings() {
+    for (const position in positions) {
+        const selectedPlayer = positions[position].selected;
+        positions[position].players.forEach(player => {
+            // Изменяем рейтинг только для игроков не в составе команды
+            if (!selectedPlayer || player.nickname !== selectedPlayer.nickname) {
+                const randomChange = Math.random();
+                if (randomChange < 0.3) {          // 30%: +1 к рейтингу
+                    player.rating = Math.min(110, player.rating + 1);
+                } else if (randomChange < 0.6) {   // 30%: -1 к рейтингу
+                    player.rating = Math.max(40, player.rating - 1);
+                }
+                // Если randomChange >= 0.60 (40%) - рейтинг не меняется
+            }
+        });
+    }
 }
 </script>
 
