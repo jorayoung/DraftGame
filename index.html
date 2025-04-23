@@ -1216,6 +1216,22 @@
 .cup-display[data-cup="bronze"] { border-color: #cd7f32; }
 .cup-display[data-cup="silver"] { border-color: #c0c0c0; }
 .cup-display[data-cup="gold"] { border-color: #ffd700; }
+
+.game-over-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ff4444;
+    font-size: 24px;
+    text-align: center;
+}
 </style>
 </head>
 <body>
@@ -2137,7 +2153,11 @@ const newSeasonButton = document.getElementById('newSeasonButton');
 }
 
 function closeStats() {
-    document.getElementById('statsOverlay').style.display = 'none';
+    if(isGameOver) {
+        window.location.href = "PLAY.html"; // Перенаправляем в главное меню
+    } else {
+        document.getElementById('statsOverlay').style.display = 'none';
+    }
 }
 
 function simulateMatch() {
@@ -2331,7 +2351,6 @@ if(userGoals > opponentGoals) {
     }
 } else {
     if(currentRound === 1) {
-        relegateCup(); // Понижение кубка при поражении в финале
     }
 }
     // Восстановление здоровья перед новым матчем
@@ -2581,11 +2600,13 @@ function generateExtraTimeEvents(userRating, opponentRating, duration) {
 }
 
 function playMatch() {
+    if(isGameOver) return;
     document.getElementById('backToMenuButton').style.display = 'none';
     simulateMatch();
 }
 
 function nextMatch() {
+    if(isGameOver) return;
     currentOpponent = getNextOpponent();
     usedOpponents.push(currentOpponent.name);
     
@@ -3784,22 +3805,50 @@ function promoteCup() {
 function relegateCup() {
     switch(currentCup) {
         case 'gold': 
-            currentCup = 'silver'; // Золотой -> Серебряный
+            currentCup = 'silver';
             break;
         case 'silver': 
-            currentCup = 'bronze'; // Серебряный -> Бронзовый
+            currentCup = 'bronze';
             break;
         case 'bronze': 
             gameOver();
-            break;
+            return; // Прерываем выполнение
     }
     updateCupDisplay();
+    
+    // При вылете из любого дивизиона сбрасываем прогресс
+    if(currentCup === 'bronze') {
+        bronzeCups = Math.max(0, bronzeCups - 1);
+    }
+    
+    // Обновляем отображение статистики
+    updateTopScorersDisplay();
 }
 
 function gameOver() {
     isGameOver = true;
-    alert('Игра окончена! Ваша команда вылетела из всех дивизионов!');
-    document.querySelectorAll('button').forEach(btn => btn.disabled = true);
+    
+    // Останавливаем все интервалы
+    clearInterval(matchInterval);
+    
+    // Скрываем все игровые окна
+
+    document.getElementById('transferOverlay').style.display = 'none';
+    document.getElementById('statsOverlay').style.display = 'flex'; // Показываем статистику
+    
+    // Обновляем кнопки в окне статистики
+    document.getElementById('newSeasonButton').style.display = 'none';
+    document.getElementById('closeStatsButton').style.display = 'block';
+    document.getElementById('closeStatsButton').textContent = 'В главное меню';
+    
+    // Блокируем игровые взаимодействия
+    document.querySelectorAll('.player-circle').forEach(circle => {
+        circle.style.pointerEvents = 'none';
+    });
+    
+    // Показываем финальное сообщение
+    const statsTable = document.querySelector('#statsTable tbody');
+    statsTable.innerHTML = `<tr><td colspan="2" style="color: #ff4444; text-align: center;">Игра окончена! Ваша команда вылетела из всех дивизионов</td></tr>`;
 }
 </script>
 
