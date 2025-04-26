@@ -1232,9 +1232,140 @@
     font-size: 24px;
     text-align: center;
 }
+
+.menu-button {
+    position: fixed;
+    top: 65px;
+    left: 15px;
+    padding: 12px 25px;
+    font-size: 16px;
+    font-weight: 600;
+    background: linear-gradient(135deg, #0066cc, #00bfff);
+    color: white;
+    text-decoration: none;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.menu-button::before {
+    content: "←";
+    font-size: 20px;
+}
+
+.menu-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.25);
+    background: linear-gradient(135deg, #0052a3, #0099cc);
+}
+
+.menu-button:active {
+    transform: translateY(1px);
+}
+
+@keyframes cupPrizeBlink {
+    0% { opacity: 0; transform: translate(-50%,-50%) scale(0.5); }
+    20% { opacity: 1; transform: translate(-50%,-50%) scale(1.5); }
+    40% { transform: translate(-50%,-50%) scale(0.9); }
+    60% { transform: translate(-50%,-50%) scale(1.2); }
+    100% { opacity: 0; transform: translate(-50%,-50%) scale(1.5); }
+}
+
+.cup-prize-animation {
+    display: block;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    z-index: 10000;
+    pointer-events: none;
+    font-size: 40px;
+    font-weight: bold;
+    animation: cupPrizeBlink 1.5s ease-out;
+    text-shadow: 0 0 20px rgba(255,255,255,0.5);
+}
+
+.cup-prize-animation.bronze { color: #cd7f32; }
+.cup-prize-animation.silver { color: #c0c0c0; }
+.cup-prize-animation.gold { color: #ffd700; }
+
+#teamsOverlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 3500;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+}
+
+#teamsPopup {
+    background: linear-gradient(145deg, #222, #1a1a1a);
+    padding: 20px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 700px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 20px rgba(0,0,0,0.6);
+}
+
+.team-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow-y: auto;
+    flex: 1;
+    padding-right: 8px;
+    margin-bottom: 15px;
+}
+
+.team-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    background: rgba(0, 191, 255, 0.05);
+    border-radius: 8px;
+    transition: background 0.3s;
+}
+
+.team-item:hover {
+    background: rgba(0, 191, 255, 0.1);
+}
+
+.team-rank {
+    width: 40px;
+    text-align: center;
+    font-weight: bold;
+    color: #00bfff;
+}
+
+.team-logo-small {
+    width: 40px;
+    height: 40px;
+    margin: 0 15px;
+    object-fit: contain;
+}
+
+.team-name {
+    flex-grow: 1;
+    font-size: 14px;
+}
 </style>
 </head>
 <body>
+<a href="https://jorayoung.github.io/DraftMenu/" class="menu-button">В меню</a>
 <audio id="tapSound" src="tap.mp3"></audio>
 <h2>Выберите состав команды</h2>
 
@@ -1416,7 +1547,7 @@
     </div>
 </div>
 <div id="millionAnimation" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); z-index: 10000; pointer-events: none; font-size: 40px; color: gold; text-shadow: 0 0 20px yellow; animation: millionBlink 1.5s ease-out;">
-    +600 000 ₽
+    +500 000 ₽
 </div>
 
 
@@ -1450,6 +1581,14 @@
   </div>
 </div>
 
+<div id="teamsOverlay">
+    <div id="teamsPopup">
+        <div class="market-title">Список всех команд</div>
+        <div class="team-list" id="teamList"></div>
+        <button class="transfer-button" onclick="closeTeamsList()">Назад</button>
+    </div>
+</div>
+
 <!-- Окно болезни игрока -->
 <div id="sicknessOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 8000; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
   <div id="sicknessPopup" style="background: linear-gradient(145deg, #2a1a1a, #3a1a1a); padding: 30px; border-radius: 15px; text-align: center; width: 90%; max-width: 400px; box-shadow: 0 0 20px rgba(255,68,68,0.3); border: 2px solid #ff4444;">
@@ -1460,6 +1599,8 @@
 </div>
 
 <div id="cupDisplay" class="cup-display">Серебряный Кубок</div>
+
+<div id="cupPrizeAnimation" class="cup-prize-animation" style="display: none;"></div>
 <script>
   // Защита от открытия консоли
   document.addEventListener('contextmenu', function(e) {
@@ -1537,6 +1678,11 @@
             { rating: 49, nickname: "корж" },
             { rating: 50, nickname: "feli4ka" },
             { rating: 80, nickname: "akashi" },
+            { rating: 57, nickname: "A-line" },
+            { rating: 50, nickname: "Puerto" },
+            { rating: 69, nickname: "pyrokinesis" },
+            { rating: 88, nickname: "skit" },
+            { rating: 70, nickname: "Elv1sSs" },
         ]
     },
     CDM: { 
@@ -1596,6 +1742,11 @@
             { rating: 45, nickname: "kistyyx" },
             { rating: 54, nickname: "whiwens" },
             { rating: 53, nickname: "kuchoo" },
+            { rating: 61, nickname: "woqh" },
+            { rating: 50, nickname: "F1nN3r" },
+            { rating: 51, nickname: "Infinite" },
+            { rating: 56, nickname: "Modrić" },
+            { rating: 78, nickname: "quinteros" },
       ]
     },
     ST: { 
@@ -1654,6 +1805,11 @@
             { rating: 64, nickname: "Tossico" },
             { rating: 53, nickname: "ifq" },
             { rating: 67, nickname: "Mokujin" },
+            { rating: 45, nickname: "Trevors" },
+            { rating: 47, nickname: "Owenau" },
+            { rating: 50, nickname: "_u1trex_" },
+            { rating: 57, nickname: "Isagi" },
+            { rating: 58, nickname: "emnay" },
 
         ]
     },
@@ -1713,6 +1869,11 @@
             { rating: 55, nickname: "Durex" },
             { rating: 67, nickname: "Supersonic" },
             { rating: 53, nickname: "WolfySX" },
+            { rating: 48, nickname: "снфр" },
+            { rating: 47, nickname: "Versus" },
+            { rating: 49, nickname: "nyam." },
+            { rating: 51, nickname: "UaZziK" },
+            { rating: 58, nickname: "neymarjr" },
         ]
     }
 };
@@ -1859,8 +2020,8 @@ let silverCups = 0;
 let bronzeCups = 0;
 let currentCup = 'silver'; // Начальный кубок
 const CUP_RANGES = {
-    bronze: { min: 0, max: 34 },
-    silver: { min: 35, max: 57 },
+    bronze: { min: 0, max: 30 },
+    silver: { min: 31, max: 57 },
     gold: { min: 58, max: 100 }
 };
 
@@ -2187,6 +2348,9 @@ function simulateMatch() {
         for (const event of currentEvents) {
             if (event.isUserGoal) {
                 userGoals++;
+                const tapSound = document.getElementById('tapSound');
+                tapSound.currentTime = 0;
+                tapSound.play();
                 const goalEvent = document.createElement('div');
                 goalEvent.className = 'goal-event user-goal';
                 goalEvent.textContent = `${minutes}:${seconds} ⚽ ГОЛ! ${event.scorer} забивает за вашу команду!`;
@@ -2210,6 +2374,9 @@ function simulateMatch() {
 }
             } else {
                 opponentGoals++;
+                const tapSound = document.getElementById('tapSound');
+                tapSound.currentTime = 0;
+                tapSound.play();
                 const goalEvent = document.createElement('div');
                 goalEvent.className = 'goal-event opponent-goal';
                 goalEvent.textContent = `${minutes}:${seconds} ⚽ ГОЛ! ${event.scorer} забивает за ${currentOpponent.name}!`;
@@ -2339,20 +2506,36 @@ function playExtraTime(duration) {
 }
 
 function determineMatchOutcome() {
-if(userGoals > opponentGoals) {
-    if(currentRound === 1) {
-            switch (currentCup) {
-                case 'gold': goldCups++; break;
-                case 'silver': silverCups++; break;
-                case 'bronze': bronzeCups++; break;
+    if(userGoals > opponentGoals) {
+        if(currentRound === 1) {
+            // Начисление призовых за кубок
+            let prizeAmount = 0;
+            switch(currentCup) {
+                case 'bronze': 
+                    prizeAmount = 1000000;
+                    bronzeCups++; 
+                    break;
+                case 'silver': 
+                    prizeAmount = 3000000;
+                    silverCups++; 
+                    break;
+                case 'gold': 
+                    prizeAmount = 10000000;
+                    goldCups++; 
+                    break;
             }
-        promoteCup(); // Повышение кубка при победе в финале
-        tournamentWon = true;
+            
+            balance += prizeAmount;
+            showCupPrizeAnimation(prizeAmount, currentCup);
+            updateBalanceDisplay();
+            
+            promoteCup();
+            tournamentWon = true;
+        }
+    } else {
+        if(currentRound === 1) {
+        }
     }
-} else {
-    if(currentRound === 1) {
-    }
-}
     // Восстановление здоровья перед новым матчем
     handleSickness();
     isOvertime = false; // Сбросить флаг при любом исходе
@@ -2363,7 +2546,7 @@ if(userGoals > opponentGoals) {
 
     if (userGoals > opponentGoals) {
         // Начисляем 600 000 за победу
-balance += 600000;
+balance += 500000;
 const animElement = document.getElementById('millionAnimation');
 animElement.style.display = 'block';
 setTimeout(() => animElement.style.display = 'none', 1500);
@@ -2664,6 +2847,7 @@ window.onload = function() {
     for (const position in positions) {
         showPlayers(position);
     }
+    document.getElementById('opponentLogo').addEventListener('click', showTeamsList);
     document.getElementById('balanceDisplay').textContent = 
         `Баланс: ${balance.toLocaleString()} ₽`;
 };
@@ -3849,6 +4033,40 @@ function gameOver() {
     // Показываем финальное сообщение
     const statsTable = document.querySelector('#statsTable tbody');
     statsTable.innerHTML = `<tr><td colspan="2" style="color: #ff4444; text-align: center;">Игра окончена! Ваша команда вылетела из всех дивизионов</td></tr>`;
+}
+
+function showCupPrizeAnimation(amount, cupType) {
+    const animElement = document.getElementById('cupPrizeAnimation');
+    animElement.textContent = `+${amount.toLocaleString()} ₽`;
+    animElement.className = `cup-prize-animation ${cupType}`;
+    animElement.style.display = 'block';
+    
+    setTimeout(() => {
+        animElement.style.display = 'none';
+    }, 1500);
+}
+
+function showTeamsList() {
+    const sortedTeams = [...opponentTeams].sort((a, b) => b.rating - a.rating);
+    const teamList = document.getElementById('teamList');
+    teamList.innerHTML = '';
+
+    sortedTeams.forEach((team, index) => {
+        const teamItem = document.createElement('div');
+        teamItem.className = 'team-item';
+        teamItem.innerHTML = `
+            <div class="team-rank">${index + 1}</div>
+            <img src="${team.logo}" class="team-logo-small" alt="${team.name}">
+            <div class="team-name">${team.name}</div>
+        `;
+        teamList.appendChild(teamItem);
+    });
+
+    document.getElementById('teamsOverlay').style.display = 'flex';
+}
+
+function closeTeamsList() {
+    document.getElementById('teamsOverlay').style.display = 'none';
 }
 </script>
 
