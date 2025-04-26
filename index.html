@@ -4000,10 +4000,6 @@ function relegateCup() {
     }
     updateCupDisplay();
     
-    // При вылете из любого дивизиона сбрасываем прогресс
-    if(currentCup === 'bronze') {
-        bronzeCups = Math.max(0, bronzeCups - 1);
-    }
     
     // Обновляем отображение статистики
     updateTopScorersDisplay();
