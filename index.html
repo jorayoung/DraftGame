@@ -1362,6 +1362,51 @@
     flex-grow: 1;
     font-size: 14px;
 }
+
+.challenges-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.challenge-item {
+  background: rgba(0, 191, 255, 0.1);
+  padding: 15px;
+  border-radius: 10px;
+  border: 1px solid #00bfff;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.challenge-item:hover {
+  background: rgba(0, 191, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.challenge-header {
+  font-size: 18px;
+  color: #00bfff;
+  margin-bottom: 10px;
+}
+
+.challenge-details {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  font-size: 14px;
+}
+
+.challenge-cup {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.cup-bronze { background: #cd7f32; }
+.cup-silver { background: #c0c0c0; }
+.cup-gold { background: #daa520; }
 </style>
 </head>
 <body>
@@ -1601,6 +1646,33 @@
 <div id="cupDisplay" class="cup-display">Серебряный Кубок</div>
 
 <div id="cupPrizeAnimation" class="cup-prize-animation" style="display: none;"></div>
+
+<button class="menu-button" id="challengesButton" onclick="showChallengesMenu()" style="top: 125px;">Челленджи</button>
+
+<!-- Модальное окно челленджей -->
+<div id="challengesOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10000; align-items: center; justify-content: center;">
+  <div id="challengesPopup" style="background: linear-gradient(145deg, #222, #1a1a1a); padding: 25px; border-radius: 15px; width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto;">
+    <h2 style="color: #00bfff; text-align: center;">Выберите челлендж</h2>
+    <div id="challengesList" class="challenges-container"></div>
+<button onclick="closeChallengesMenu()" 
+        style="display: block;
+               margin: 20px auto 0;
+               padding: 12px 25px;
+               font-size: 16px;
+               font-weight: 600;
+               background: linear-gradient(135deg, #0066cc, #00bfff);
+               color: white;
+               border: none;
+               border-radius: 25px;
+               cursor: pointer;
+               transition: all 0.3s;
+               position: relative;
+               overflow: hidden;
+               box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+    Назад
+</button>
+  </div>
+</div>
 <script>
   // Защита от открытия консоли
   document.addEventListener('contextmenu', function(e) {
@@ -2015,13 +2087,15 @@ let sicknessActive = false; // Флаг активности болезни
 let isInLowerBracket = false; // Находится ли игрок в нижней сетке
 let lowerBracketRound = 0; // Текущий раунд в нижней сетке
 let isGameOver = false;
+let isChallengeMode = false;
+let currentChallenge = null;
 let goldCups = 0;
 let silverCups = 0;
 let bronzeCups = 0;
 let currentCup = 'silver'; // Начальный кубок
 const CUP_RANGES = {
-    bronze: { min: 0, max: 30 },
-    silver: { min: 31, max: 57 },
+    bronze: { min: 0, max: 26 },
+    silver: { min: 27, max: 57 },
     gold: { min: 58, max: 100 }
 };
 
@@ -2046,18 +2120,62 @@ function showTeamNameModal() {
 
 // Функция для подтверждения названия команды
 function confirmTeamName() {
+    // Если активирован режим челленджа
+    if (isChallengeMode) {
+        // Устанавливаем название команды из выбранного челленджа
+        userTeamName = currentChallenge ? 
+            Object.keys(challenges).find(key => challenges[key] === currentChallenge) : 
+            "Челлендж";
+        
+        // Скрываем модальное окно ввода названия
+        document.getElementById('teamNameModal').style.display = 'none';
+        
+        // Запускаем турнир с предустановленными параметрами
+        startTournament();
+        return;
+    }
+
+    // Стандартная обработка для обычного режима
     const nameInput = document.getElementById('teamNameInput');
-    if (nameInput.value.trim() === '') {
+    const teamName = nameInput.value.trim();
+
+    // Проверка на пустое название
+    if (teamName === '') {
         alert("Пожалуйста, введите название команды!");
         return;
     }
-    userTeamName = nameInput.value.trim();
+
+    // Проверка на минимальную длину названия
+    if (teamName.length < 3) {
+        alert("Название команды должно содержать минимум 3 символа!");
+        return;
+    }
+
+    // Проверка на максимальную длину
+    if (teamName.length > 20) {
+        alert("Название команды не должно превышать 20 символов!");
+        return;
+    }
+
+    // Установка названия команды
+    userTeamName = teamName;
+
+    // Скрытие модального окна
     document.getElementById('teamNameModal').style.display = 'none';
+
+    // Запуск турнира
     startTournament();
+    
+    // Скрытие кнопки челленджей после подтверждения
+    document.getElementById('challengesButton').style.display = 'none';
 }
 
 function backToMenu() {
+  if (isChallengeMode) {
+    window.location.reload(); // Полная перезагрузка для сброса челленджа
+  } else {
     window.location.href = "https://jorayoung.github.io/DraftMenu/";
+  }
 }
 
 function getRandomScorer(position) {
@@ -2123,13 +2241,17 @@ function getNextOpponent() {
 }
 
 function showPlayers(position) {
-    shuffleArray(positions[position].players);
-    positions[position].container.innerHTML = '';
+  shuffleArray(positions[position].players);
+  positions[position].container.innerHTML = '';
+
+
 
     for (let i = 0; i < numPlayersToShow; i++) {
         if (!positions[position].players[i]) continue;
         const playerData = positions[position].players[i];
         
+
+
         const playerWrapper = document.createElement('div');
         playerWrapper.className = 'player-wrapper';
         
@@ -2156,10 +2278,14 @@ function showPlayers(position) {
         nicknameDiv.className = 'player-nickname';
         nicknameDiv.textContent = playerData.nickname;
         
+
+positions[position].players.forEach(playerData => {
         playerCircle.appendChild(ratingDiv);
         playerCircle.appendChild(nicknameDiv);
         playerWrapper.appendChild(playerCircle);
-        
+  });        
+
+
         playerCircle.addEventListener('click', () => {
             const allPlayers = positions[position].container.querySelectorAll('.player-circle');
             allPlayers.forEach(p => p.classList.remove('selected'));
@@ -2172,7 +2298,10 @@ function showPlayers(position) {
             } else {
                 startButton.style.display = 'none';
             }
-        });
+        if (isChallengeMode) {
+    document.getElementById('challengesButton').style.display = 'none';
+  }
+});
         
         positions[position].container.appendChild(playerWrapper);
     }
@@ -4063,6 +4192,152 @@ function showTeamsList() {
 
 function closeTeamsList() {
     document.getElementById('teamsOverlay').style.display = 'none';
+}
+
+const challenges = {
+  "NoStuff [E-HAX2]": {
+    positions: {
+      GK: ["Jora young (56)", "diseased (70)"],
+      CDM: ["adriano (83)", "ninowka (91)", "overdosed (55)"],
+      ST: ["Malasi (55)", "Kor (92)", "тихий парень (49)"],
+      CF: ["dark_pr1nce (63)", "iwersy (61)"]
+    },
+    budget: 20000000,
+    cup: "silver"
+  },
+  "Томь [ЧР8]": {
+    positions: {
+      GK: ["Guus (46)", "rodrygo (46)"],
+      CDM: ["F1nN3r (49)", "wizout (50)"],
+      ST: ["Jora young (47)", "Falluntg (46)"],
+      CF: ["Malasi (46)", "Rasputin (67)"]
+    },
+    budget: 2500000,
+    cup: "bronze"
+  },
+  "NoStuff [ЛЧ4]": {
+    positions: {
+      GK: ["oskasya (51)", "-nK (90)"],
+      CDM: ["Murphy (91)", "berserk (69)"],
+      ST: ["Kor (95)", "friend shiro (50)"],
+      CF: ["Jora young (62)", "pluto (67)"]
+    },
+    budget: 70000000,
+    cup: "gold"
+  },
+  "ФК Ростов [25/26]": {
+    positions: {
+      GK: ["Р. Ятимов (70)", "Д. Одоевский (66)"],
+      CDM: ["А. Лангович (69)", "А. Сутормин (71)", "В. Мелёхин (69)", "И. Вахания (71)"],
+      ST: ["Х. Байрамян (71)", "М. Мохеби (72)", "К. Щетинин (72)"],
+      CF: ["С. Роналдо (73)", "Н. Комличенко (73)"]
+    },
+    budget: 30000000,
+    cup: "silver"
+  },
+  "Medvjedi [ЧР5]": {
+    positions: {
+      GK: ["ıIıIİıİIımusic (95)", "Nujabes (85)"],
+      CDM: ["Ice Bear (87)", "waff (89)", "wool (73)"],
+      ST: ["Wenamka (99)", "Stiks (84)"],
+      CF: ["Pyro (90)", "IIIHA (85)"]
+    },
+    budget: 60000000,
+    cup: "gold"
+  },
+  "NoStuff [ЧР14]": {
+    positions: {
+      GK: ["lis (60)", "Nagiев (46)"],
+      CDM: ["шиммер (81)", "berserk (72)"],
+      ST: ["pluto (59)", "Jora young (55)"],
+      CF: ["Björn (80)", "Malasi (51)", "Alonso (53)"]
+    },
+    budget: 65000000,
+    cup: "silver"
+  },
+  "NoStuff [ЧР13]": {
+    positions: {
+      GK: ["oskasya (50)", "wool (70)", "really (50)"],
+      CDM: ["zxc (53)", "13setz (55)", "PPL217 (50)"],
+      ST: ["pluto (57)", "Jora young (54)", "convulsive_seizures (51)", "honey (61)", "drakula (60)"],
+      CF: ["ottop (71)", "Malasi (53)", "chesdes (53)", "friend shiro (50)", "berserk (72)"]
+    },
+    budget: 50000000,
+    cup: "bronze"
+  }
+};
+
+// Добавьте функции для работы с челленджами
+function showChallengesMenu() {
+  const container = document.getElementById('challengesList');
+  container.innerHTML = '';
+  
+  // Преобразуем объект в массив и перемешиваем
+  const challengesArray = Object.entries(challenges);
+  const shuffledChallenges = shuffleArray(challengesArray);
+  
+  // Создаем элементы в перемешанном порядке
+  for (const [name, data] of shuffledChallenges) {
+    const challengeEl = document.createElement('div');
+    challengeEl.className = 'challenge-item';
+    challengeEl.innerHTML = `
+      <div class="challenge-header">${name}</div>
+      <div class="challenge-details">
+        <div>Бюджет: ${data.budget.toLocaleString()} ₽</div>
+        <div>Кубок: 
+          <span class="challenge-cup cup-${data.cup}">
+            ${data.cup === 'bronze' ? 'Бронзовый' : 
+             data.cup === 'silver' ? 'Серебряный' : 'Золотой'}
+          </span>
+        </div>
+      </div>
+    `;
+    
+    challengeEl.addEventListener('click', () => startChallenge(name));
+    container.appendChild(challengeEl);
+  }
+  
+  document.getElementById('challengesOverlay').style.display = 'flex';
+}
+
+function closeChallengesMenu() {
+  document.getElementById('challengesOverlay').style.display = 'none';
+}
+
+function startChallenge(name) {
+  isChallengeMode = true;
+  currentChallenge = challenges[name];
+  
+  // Установка параметров челленджа
+  balance = currentChallenge.budget;
+  currentCup = currentChallenge.cup;
+  userTeamName = name;
+  
+  // Очистка текущего состава
+  for (const position in positions) {
+    positions[position].selected = null;
+    positions[position].players = [];
+  }
+
+  // Заполнение игроков для челленджа
+  for (const [pos, players] of Object.entries(currentChallenge.positions)) {
+    positions[pos].players = players.map(p => {
+      const [nickname, rating] = p.split(' (');
+      return {
+        nickname: nickname.trim(),
+        rating: parseInt(rating),
+        isChallenge: true
+      };
+    });
+  }
+
+  // Обновление интерфейса
+  updateCupDisplay();
+  document.getElementById('balanceDisplay').textContent = `Баланс: ${balance.toLocaleString()} ₽`;
+  for (const position in positions) showPlayers(position);
+  
+  closeChallengesMenu();
+  document.getElementById('challengesButton').style.display = 'none';
 }
 </script>
 
