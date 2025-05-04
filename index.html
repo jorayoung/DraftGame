@@ -1407,6 +1407,120 @@
 .cup-bronze { background: #cd7f32; }
 .cup-silver { background: #c0c0c0; }
 .cup-gold { background: #daa520; }
+
+#lazyOverlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 9000;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(5px);
+}
+
+#lazyPopup {
+    background: linear-gradient(145deg, #2a2a1a, #3a3a1a);
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 0 20px rgba(255, 255, 0, 0.3);
+    border: 2px solid #ffd700;
+    animation: lazyGlow 1.5s infinite;
+}
+
+@keyframes lazyGlow {
+    0% { box-shadow: 0 0 15px rgba(255,215,0,0.3); }
+    50% { box-shadow: 0 0 25px rgba(255,215,0,0.5); }
+    100% { box-shadow: 0 0 15px rgba(255,215,0,0.3); }
+}
+
+.lazy-message {
+    font-size: 18px;
+    margin: 20px 0;
+    color: #ffdd00;
+}
+
+@keyframes developmentGlow {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.development-notification {
+  animation: developmentGlow 1.5s infinite;
+}
+
+#scoutPopup {
+  background: linear-gradient(145deg, #1a2a1a, #2a3a2a);
+  border: 2px solid #7cfc00;
+  animation: scoutGlow 1.5s infinite;
+}
+
+@keyframes scoutGlow {
+  0% { box-shadow: 0 0 15px rgba(124,252,0,0.3); }
+  50% { box-shadow: 0 0 25px rgba(124,252,0,0.5); }
+  100% { box-shadow: 0 0 15px rgba(124,252,0,0.3); }
+}
+
+#scoutPlayer {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto;
+}
+
+.nomination-card {
+  background: rgba(255,255,255,0.1);
+  border-radius: 15px;
+  padding: 20px;
+  margin: 20px 0;
+  border: 2px solid;
+  box-shadow: 0 0 15px rgba(0,191,255,0.3);
+}
+
+.nomination-title {
+  font-size: 24px;
+  color: #00bfff;
+  margin-bottom: 15px;
+  text-shadow: 0 0 10px rgba(0,191,255,0.3);
+}
+
+.player-card {
+  background: linear-gradient(145deg, rgba(0,0,0,0.5), rgba(50,50,50,0.5));
+  border-radius: 10px;
+  padding: 15px;
+  margin: 10px auto;
+  width: 80%;
+  border: 1px solid #00bfff;
+}
+
+.player-rating-badge {
+  font-size: 24px;
+  background: #00bfff;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 10px;
+}
+
+#nominationsButton {
+    display: block !important;
+    margin: 20px auto 0 !important;
+    padding: 12px 25px;
+    background: linear-gradient(135deg, #00bfff, #0066cc);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+}
 </style>
 </head>
 <body>
@@ -1673,6 +1787,57 @@
 </button>
   </div>
 </div>
+
+<div id="lazyOverlay">
+    <div id="lazyPopup">
+        <h3 style="color: #ffd700;">⚠️ Игрок расслабился!</h3>
+        <div id="lazyMessage" class="lazy-message"></div>
+        <button onclick="closeLazyMenu()" 
+                style="padding: 12px 25px;
+                       font-size: 16px;
+                       background: linear-gradient(135deg, #ffd700, #daa520);
+                       color: black;
+                       border: none;
+                       border-radius: 25px;
+                       cursor: pointer;">
+            Продолжить
+        </button>
+    </div>
+</div>
+
+<div id="developmentOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10000; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
+  <div style="background: linear-gradient(145deg, #1a2a1a, #2a3a2a); padding: 30px; border-radius: 15px; text-align: center; box-shadow: 0 0 20px rgba(0,255,0,0.3); border: 2px solid #00ff00;">
+    <h3 style="color: #7cfc00;">Развитие игрока!</h3>
+    <div id="developmentMessage" style="font-size: 20px; margin: 20px 0;"></div>
+    <button onclick="closeDevelopmentMenu()" style="padding: 12px 25px; background: #0066cc; color: white; border: none; border-radius: 20px; cursor: pointer;">OK</button>
+  </div>
+</div>
+
+<!-- Модальное окно скаута -->
+<div id="scoutOverlay" class="market-overlay">
+  <div id="scoutPopup" class="market-popup">
+    <h3 id="scoutTitle">Обнаружен талант!</h3>
+    <div class="player-info">
+      <div id="scoutPlayer" class="player-circle"></div>
+      <div id="scoutDescription" style="margin-top: 15px;"></div>
+    </div>
+    <button class="market-button confirm" onclick="closeScoutMenu()">Понятно</button>
+  </div>
+</div>
+
+<div id="nominationsOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10000; align-items: center; justify-content: center; font-family: Arial, sans-serif;">
+  <div style="background: linear-gradient(145deg, #1a1a1a, #222); padding: 30px; border-radius: 15px; width: 90%; max-width: 600px; position: relative;">
+    <div id="nominationContent" style="text-align: center;">
+      <!-- Контент будет обновляться динамически -->
+    </div>
+    <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+      <button onclick="changeNominationPage(-1)" style="padding: 10px 20px; background: #00bfff; border: none; border-radius: 5px; color: white; cursor: pointer;">← Назад</button>
+      <div id="pageIndicator" style="color: white;">1/9</div>
+      <button onclick="changeNominationPage(1)" style="padding: 10px 20px; background: #00bfff; border: none; border-radius: 5px; color: white; cursor: pointer;">Вперед →</button>
+    </div>
+    <button onclick="closeNominations()" style="position: absolute; top: 10px; right: 10px; background: #ff4444; border: none; border-radius: 5px; color: white; padding: 5px 10px; cursor: pointer;">×</button>
+  </div>
+</div>
 <script>
   // Защита от открытия консоли
   document.addEventListener('contextmenu', function(e) {
@@ -1745,7 +1910,7 @@
             { rating: 55, nickname: "Kifla" },
             { rating: 48, nickname: "b⁸" },
             { rating: 50, nickname: "bonusbuychik" },
-            { rating: 68, nickname: "Фругер" },
+            { rating: 44, nickname: "𝙉 𝘼 𝙑 𝘼 𝙎" },
             { rating: 48, nickname: "pro0ch" },
             { rating: 49, nickname: "корж" },
             { rating: 50, nickname: "feli4ka" },
@@ -1755,6 +1920,11 @@
             { rating: 69, nickname: "pyrokinesis" },
             { rating: 88, nickname: "skit" },
             { rating: 70, nickname: "Elv1sSs" },
+            { rating: 45, nickname: "xmq" },
+            { rating: 55, nickname: "Henry" },
+            { rating: 58, nickname: "jetta" },
+            { rating: 46, nickname: "dawy" },
+            { rating: 44, nickname: "psevdoooo" },
         ]
     },
     CDM: { 
@@ -1819,6 +1989,11 @@
             { rating: 51, nickname: "Infinite" },
             { rating: 56, nickname: "Modrić" },
             { rating: 78, nickname: "quinteros" },
+            { rating: 45, nickname: "Barboskin" },
+            { rating: 81, nickname: "Погребняк Паша" },
+            { rating: 69, nickname: "nokk" },
+            { rating: 59, nickname: "wizout" },
+            { rating: 82, nickname: "Vaske" },
       ]
     },
     ST: { 
@@ -1882,6 +2057,11 @@
             { rating: 50, nickname: "_u1trex_" },
             { rating: 57, nickname: "Isagi" },
             { rating: 58, nickname: "emnay" },
+            { rating: 56, nickname: "ugly322" },
+            { rating: 61, nickname: "MAKSIM_LUKIN" },
+            { rating: 50, nickname: "eomzz" },
+            { rating: 43, nickname: "Diveev" },
+            { rating: 69, nickname: "warlock" },
 
         ]
     },
@@ -1946,6 +2126,11 @@
             { rating: 49, nickname: "nyam." },
             { rating: 51, nickname: "UaZziK" },
             { rating: 58, nickname: "neymarjr" },
+            { rating: 86, nickname: "Sиdney L" },
+            { rating: 54, nickname: "really" },
+            { rating: 49, nickname: "Sh1rox" },
+            { rating: 60, nickname: "Пеля" },
+            { rating: 46, nickname: "зверь" },
         ]
     }
 };
@@ -2059,6 +2244,21 @@
     { name: "КБ", logo: "logo_КБ.png", rating: 40 },
     { name: "FLASP YOUNGSTERS", logo: "logo_FLASP YOUNGSTERS.png", rating: 40 },
     { name: "HC Sleepy Souls", logo: "logo_HC Sleepy Souls.png", rating: 25 },
+    { name: "Тачки", logo: "logo_Тачки.png", rating: 43 },
+    { name: "Neftchi PFC", logo: "logo_Neftchi PFC.png", rating: 38 },
+    { name: "Netherlands", logo: "logo_Netherlands.png", rating: 30 },
+    { name: "MyZeloHale", logo: "logo_MyZeloHale.png", rating: 22 },
+    { name: "Squad Bad Stars", logo: "logo_Squad Bad Stars.png", rating: 25 },
+    { name: "Автобус", logo: "logo_Автобус.png", rating: 43 },
+    { name: "Параличи Двача", logo: "logo_Параличи Двача.png", rating: 33 },
+    { name: "demonicca", logo: "logo_demonicca.png", rating: 44 },
+    { name: "Chill Boys", logo: "logo_Chill Boys.png", rating: 59 },
+    { name: "э", logo: "logo_э.png", rating: 38 },
+    { name: "Portugal", logo: "logo_Portugal.png", rating: 39 },
+    { name: "Atlanta", logo: "logo_Atlanta.png", rating: 40 },
+    { name: "Cursed Sun", logo: "logo_Cursed Sun.png", rating: 35 },
+    { name: "Kalich Gaming", logo: "logo_Kalich Gaming.png", rating: 59 },
+    { name: "Two-Z", logo: "logo_Two-Z.png", rating: 30 },
 
 ];
 
@@ -2068,6 +2268,7 @@ let userTeamRating = 0;
 let currentOpponent = null;
 let matchInterval = null;
 let currentTime = 0;
+let scoutedPlayer = null;
 let userGoals = 0;
 let opponentGoals = 0;
 let goalEvents = [];
@@ -2089,13 +2290,19 @@ let lowerBracketRound = 0; // Текущий раунд в нижней сетк
 let isGameOver = false;
 let isChallengeMode = false;
 let currentChallenge = null;
+let currentNominationPage = 0;
+const nominationsData = [];
+let nominationsInitialized = false;
+let currentSeasonGold = 0;
+let currentSeasonSilver = 0;
+let currentSeasonBronze = 0;
 let goldCups = 0;
 let silverCups = 0;
 let bronzeCups = 0;
 let currentCup = 'silver'; // Начальный кубок
 const CUP_RANGES = {
-    bronze: { min: 0, max: 26 },
-    silver: { min: 27, max: 57 },
+    bronze: { min: 0, max: 22 },
+    silver: { min: 23, max: 57 },
     gold: { min: 58, max: 100 }
 };
 
@@ -2415,19 +2622,19 @@ function showTournamentStats() {
         statsTable.appendChild(row);
     });
     
-    const goldenBallContainer = document.getElementById('goldenBallContainer');
-    goldenBallContainer.innerHTML = '';
+ const goldenBallContainer = document.getElementById('goldenBallContainer');
+ goldenBallContainer.innerHTML = '';
     
-    if (tournamentWon && scorersArray.length > 0) {
-        const topScorer = scorersArray[0];
-        const goldenBallDiv = document.createElement('div');
-        goldenBallDiv.className = 'golden-ball';
-        goldenBallDiv.innerHTML = `
-            <div class="golden-ball-icon">🏆</div>
-            <div>Золотой мяч турнира вручается ${topScorer.name} (${topScorer.goals} голов)</div>
-        `;
-        goldenBallContainer.appendChild(goldenBallDiv);
-    }
+ if (tournamentWon && currentCup === 'gold' && scorersArray.length > 0) {
+     const topScorer = scorersArray[0];
+     const goldenBallDiv = document.createElement('div');
+     goldenBallDiv.className = 'golden-ball';
+     goldenBallDiv.innerHTML = `
+         <div class="golden-ball-icon">🏆</div>
+         <div>Золотой мяч турнира вручается ${topScorer.name} (${topScorer.goals} голов)</div>
+      `;
+     goldenBallContainer.appendChild(goldenBallDiv);
+ }
 
     // Добавленная логика для кнопки
 const newSeasonButton = document.getElementById('newSeasonButton');
@@ -2440,6 +2647,17 @@ const newSeasonButton = document.getElementById('newSeasonButton');
     }
     
     document.getElementById('statsOverlay').style.display = 'flex';
+
+if (!document.getElementById('nominationsButton')) {
+    const nominationsButton = document.createElement('button');
+    nominationsButton.id = 'nominationsButton';
+    nominationsButton.textContent = 'Номинации';
+    nominationsButton.style = `padding: 12px 25px; margin: 20px auto 0; 
+        background: linear-gradient(135deg, #00bfff, #0066cc); color: white; 
+        border: none; border-radius: 25px; cursor: pointer; display: block;`;
+    nominationsButton.onclick = showNominations;
+    statsPopup.appendChild(nominationsButton);
+ }
 }
 
 function closeStats() {
@@ -2640,19 +2858,22 @@ function determineMatchOutcome() {
             // Начисление призовых за кубок
             let prizeAmount = 0;
             switch(currentCup) {
-                case 'bronze': 
-                    prizeAmount = 1000000;
-                    bronzeCups++; 
-                    break;
-                case 'silver': 
-                    prizeAmount = 3000000;
-                    silverCups++; 
-                    break;
-                case 'gold': 
-                    prizeAmount = 10000000;
-                    goldCups++; 
-                    break;
-            }
+ case 'bronze': 
+     prizeAmount = 1000000;
+     bronzeCups += 1;  // Было = 1
+     currentSeasonBronze = 1; // Добавить эту строку
+     break;
+ case 'silver': 
+     prizeAmount = 3000000;
+     silverCups += 1;
+     currentSeasonSilver = 1; // Добавить
+     break;
+ case 'gold': 
+     prizeAmount = 10000000;
+     goldCups += 1;
+     currentSeasonGold = 1; // Добавить
+     break;
+}
             
             balance += prizeAmount;
             showCupPrizeAnimation(prizeAmount, currentCup);
@@ -2754,9 +2975,12 @@ balanceElement.classList.add('balance-blink');
         }
     }
 setTimeout(() => {
+  checkLazyPlayer();
   checkSponsorBonus();
   triggerSalaryRequest();
   checkForPenalty();
+  checkPlayerDevelopment();
+  checkScoutDiscovery();
   checkForBuyOffer(); // Добавляем эту строку
 }, 1000);
 }
@@ -3210,8 +3434,12 @@ function startNewSeason() {
     // Сбросить турнирные данные
     currentRound = 256;
     usedOpponents = [];
+    currentSeasonGold = 0;
+    currentSeasonSilver = 0;
+    currentSeasonBronze = 0;
     tournamentWon = false;
     isInLowerBracket = false;
+    nominationsInitialized = false;
     lowerBracketRound = 0;
     
     
@@ -3602,7 +3830,7 @@ function updateTopScorersDisplay() {
             <div>Серебряный Кубок: ${silverCups}</div>
             <div>Бронзовый Кубок: ${bronzeCups}</div>
         </div>
-    `;
+ `;
     
     scorersDisplay.innerHTML = html;
     scorersDisplay.scrollTop = scorersDisplay.scrollHeight;
@@ -3732,11 +3960,25 @@ function showPurchaseDialog(player) {
 }
 
 function confirmPurchase() {
-    const price = Math.pow(selectedMarketPlayer.rating, 4);
+  const price = Math.pow(selectedMarketPlayer.rating, 4);
+  
+  if (balance >= price) {
+    balance -= price;
+    positions[currentMarketPosition].selected = selectedMarketPlayer;
     
-    if (balance >= price) {
-        balance -= price;
-        positions[currentMarketPosition].selected = selectedMarketPlayer;
+    // Проверка на скаутанного игрока
+    if(scoutedPlayer && selectedMarketPlayer.nickname === scoutedPlayer.nickname) {
+      const boost = Math.floor(Math.random() * 11) + 7; // +7 до +17
+      const newRating = Math.min(110, selectedMarketPlayer.rating + boost);
+      
+      // Обновляем рейтинг
+      selectedMarketPlayer.rating = newRating;
+      positions[currentMarketPosition].selected.rating = newRating;
+      
+      // Показываем сообщение
+      alert(`${scoutedPlayer.nickname} сразу улучшился на +${boost}! Новый рейтинг: ${newRating}`);
+      scoutedPlayer = null;
+    }
         
         // Обновляем рейтинг команды
         userTeamRating = calculateUserTeamRating();
@@ -4103,16 +4345,17 @@ function updateCupDisplay() {
 function promoteCup() {
     switch(currentCup) {
         case 'bronze': 
-            currentCup = 'silver';
+            currentCup = 'silver'; // Только меняем уровень кубка
             break;
         case 'silver': 
-            currentCup = 'gold';
+            currentCup = 'gold';   // Только меняем уровень кубка
             break;
         case 'gold': 
-            // Остаемся в золотом кубке
+            // Оставляем максимальный уровень
             break;
     }
     updateCupDisplay();
+    updateTopScorersDisplay();
 }
 
 function relegateCup() {
@@ -4338,6 +4581,369 @@ function startChallenge(name) {
   
   closeChallengesMenu();
   document.getElementById('challengesButton').style.display = 'none';
+}
+
+function checkLazyPlayer() {
+    if (Math.random() < 0.04) { // 4% chance
+        const activePlayers = [];
+        // Collect all selected players
+        for (const position in positions) {
+            if (positions[position].selected) {
+                activePlayers.push({
+                    position: position,
+                    player: positions[position].selected
+                });
+            }
+        }
+        
+        if (activePlayers.length > 0) {
+            const randomPlayer = activePlayers[Math.floor(Math.random() * activePlayers.length)];
+            const newRating = Math.max(40, randomPlayer.player.rating - 3); // Min rating 40
+            
+            // Update player rating
+            randomPlayer.player.rating = newRating;
+            
+            // Update team display
+            updateTeamSquadDisplay();
+            userTeamRating = calculateUserTeamRating();
+            document.getElementById('userRatingDisplay').textContent = userTeamRating;
+            updateTeamRatingCircle();
+            
+            // Show notification
+            showLazyMenu(randomPlayer.player.nickname, newRating);
+        }
+    }
+}
+
+function showLazyMenu(playerName, newRating) {
+    document.getElementById('lazyMessage').innerHTML = `
+        ${playerName} потерял мотивацию!<br>
+        Новый рейтинг: <strong>${newRating}</strong> (-3)
+    `;
+    document.getElementById('lazyOverlay').style.display = 'flex';
+}
+
+function closeLazyMenu() {
+    document.getElementById('lazyOverlay').style.display = 'none';
+}
+
+function checkPlayerDevelopment() {
+  if (Math.random() < 0.01) { // 1% chance
+    const activePlayers = [];
+    
+    // Collect all selected players
+    for (const position in positions) {
+      if (positions[position].selected) {
+        activePlayers.push({
+          position: position,
+          player: positions[position].selected
+        });
+      }
+    }
+    
+    if (activePlayers.length > 0) {
+      const selected = activePlayers[Math.floor(Math.random() * activePlayers.length)];
+      const originalRating = selected.player.rating;
+      
+      // Increase rating (max 110)
+      selected.player.rating = Math.min(110, originalRating + 10);
+      
+      // Update displays
+      updateTeamSquadDisplay();
+      userTeamRating = calculateUserTeamRating();
+      document.getElementById('userRatingDisplay').textContent = userTeamRating;
+      updateTeamRatingCircle();
+      
+      // Show notification
+      showDevelopmentMenu(selected.player.nickname, originalRating);
+    }
+  }
+}
+
+function showDevelopmentMenu(name, originalRating) {
+  const newRating = originalRating + 10;
+  document.getElementById('developmentMessage').innerHTML = `
+    ${name} повысил навыки!<br>
+    Рейтинг: ${originalRating} → <span style="color: #7cfc00;">${newRating}</span>
+  `;
+  document.getElementById('developmentOverlay').style.display = 'flex';
+}
+
+function closeDevelopmentMenu() {
+  document.getElementById('developmentOverlay').style.display = 'none';
+}
+
+function checkScoutDiscovery() {
+  if (Math.random() < 0.02) { // 2% шанс
+    const allPlayers = [];
+    
+    // Собираем всех игроков не из команды
+    for (const position in positions) {
+      positions[position].players.forEach(player => {
+        if (!isPlayerInTeam(player.nickname) && player.rating >= 50 && player.rating <= 89) {
+          allPlayers.push({...player, position});
+        }
+      });
+    }
+    
+    if (allPlayers.length > 0) {
+      scoutedPlayer = allPlayers[Math.floor(Math.random() * allPlayers.length)];
+      showScoutMenu();
+    }
+  }
+}
+
+// Функция показа меню скаута
+function showScoutMenu() {
+  const playerCircle = document.getElementById('scoutPlayer');
+  playerCircle.innerHTML = `
+    <div class="player-rating">${scoutedPlayer.rating}</div>
+    <div class="player-nickname">${scoutedPlayer.nickname}</div>
+  `;
+  
+  // Установка класса рейтинга
+  playerCircle.className = `player-circle ${getRatingClass(scoutedPlayer.rating)}`;
+  
+  document.getElementById('scoutDescription').innerHTML = `
+    Ваш скаут нашёл таланта!<br>
+    Позиция: ${scoutedPlayer.position}<br>
+    Рекомендуем купить его на рынке!
+  `;
+  
+  document.getElementById('scoutOverlay').style.display = 'flex';
+}
+
+function closeScoutMenu() {
+  document.getElementById('scoutOverlay').style.display = 'none';
+}
+
+function getRatingClass(rating) {
+  if (rating >= 40 && rating <= 60) return 'bronze';
+  if (rating >= 61 && rating <= 80) return 'silver';
+  if (rating >= 81 && rating <= 99) return 'gold';
+  return 'red';
+}
+
+function showNominations() {
+  // Генерируем данные только один раз за сезон
+  if (!nominationsInitialized) {
+    nominationsData.length = 0;
+    nominationsData.push(createTitlePage());
+    nominationsData.push(createCupChampionPage('bronze'));
+    nominationsData.push(createCupChampionPage('silver'));
+    nominationsData.push(createCupChampionPage('gold'));
+    nominationsData.push(createBestPlayerPage('GK', 80));
+    nominationsData.push(createBestPlayerPage('CDM', 80));
+    nominationsData.push(createBestPlayerPage('ST', 85));
+    nominationsData.push(createSpecialAwardPage('Самый красивый гол года'));
+    nominationsData.push(createSpecialAwardPage('Честная игра'));
+    nominationsData.push(createGoldenBallPage());
+    nominationsInitialized = true;
+  }
+
+  currentNominationPage = 0;
+  updateNominationDisplay();
+  document.getElementById('nominationsOverlay').style.display = 'flex';
+}
+
+function createTitlePage() {
+  return {
+    type: 'title',
+    title: 'Итоги сезона'
+  };
+}
+
+function createCupChampionPage(cupType) {
+    // Заменяем проверку на currentSeasonX
+    const isWon = 
+        (cupType === 'bronze' && currentSeasonBronze > 0) ||
+        (cupType === 'silver' && currentSeasonSilver > 0) ||
+        (cupType === 'gold' && currentSeasonGold > 0);
+
+    const result = {
+        type: 'cup',
+        cupType,
+        champion: isWon ? userTeamName : getRandomTeamFromCup(cupType)
+    };
+
+    // Кэширование остается для истории, но можно убрать
+    return result;
+}
+
+function createBestPlayerPage(position, minRating) {
+  return {
+    type: 'best_player',
+    position,
+    player: getRandomPlayerByPosition(position, minRating)
+  };
+}
+
+function createSpecialAwardPage(title) {
+  return {
+    type: 'special',
+    title,
+    player: getRandomPlayer()
+  };
+}
+
+function createGoldenBallPage() {
+    let winner = null;
+    
+    // Изменяем условие на проверку золотого кубка
+    if (currentCup === 'gold' && tournamentWon) {
+        const scorersArray = Object.entries(seasonScorers).sort((a, b) => b[1] - a[1]);
+        if (scorersArray.length > 0) {
+            const topScorerName = scorersArray[0][0];
+            let playerRating = 0;
+            for (const position in positions) {
+                if (positions[position].selected && positions[position].selected.nickname === topScorerName) {
+                    playerRating = positions[position].selected.rating;
+                    break;
+                }
+            }
+            winner = [topScorerName, playerRating];
+        }
+    } else {
+        // Выбираем случайного игрока с рейтингом 85-110
+        const marketPlayers = [];
+        for (const pos in positions) {
+            marketPlayers.push(...positions[pos].players.filter(p => p.rating >= 85 && p.rating <= 110));
+        }
+        if (marketPlayers.length > 0) {
+            const randomPlayer = marketPlayers[Math.floor(Math.random() * marketPlayers.length)];
+            winner = [randomPlayer.nickname, randomPlayer.rating];
+        }
+    }
+
+    return {
+        type: 'golden_ball',
+        player: winner || ["Не определен", 0]
+    };
+}
+
+function updateNominationDisplay() {
+  const content = document.getElementById('nominationContent');
+  const data = nominationsData[currentNominationPage];
+  let html = '';
+
+  switch(data.type) {
+    case 'title':
+      html = `<h1 class="nomination-title">${data.title}</h1>`;
+      break;
+      
+    case 'cup':
+      html = `
+        <div class="nomination-card">
+          <h2 class="nomination-title">Чемпион ${getCupName(data.cupType)}</h2>
+          <div class="player-card">
+            <div style="font-size: 32px; color: ${getCupColor(data.cupType)};">
+              ${data.champion}
+            </div>
+          </div>
+        </div>
+      `;
+      break;
+      
+    case 'best_player':
+      html = `
+        <div class="nomination-card">
+          <h2 class="nomination-title">Лучший ${getPositionName(data.position)}</h2>
+          <div class="player-card">
+            <div class="player-rating-badge">${data.player.rating}</div>
+            <div style="font-size: 20px;">${data.player.nickname}</div>
+          </div>
+        </div>
+      `;
+      break;
+      
+    case 'special':
+      html = `
+        <div class="nomination-card">
+          <h2 class="nomination-title">${data.title}</h2>
+          <div class="player-card">
+            <div class="player-rating-badge">${data.player.rating}</div>
+            <div style="font-size: 20px;">${data.player.nickname}</div>
+          </div>
+        </div>
+      `;
+      break;
+      
+  case 'golden_ball':
+    html = `
+    <div class="nomination-card" style="border-color: gold;">
+        <h2 class="nomination-title" style="color: gold;">Золотой мяч</h2>
+        <div class="player-card" style="border-color: gold;">
+            <div class="player-rating-badge" style="background: gold;">${data.player[1]}</div>
+            <div style="font-size: 24px; color: gold;">
+                ${currentCup === 'gold' && tournamentWon 
+                    ? 'Лучший игрок сезона' 
+                    : 'Лучший игрок сезона'}
+                <br>${data.player[0]}
+            </div>
+        </div>
+    </div>
+`;
+    break;
+  }
+
+  content.innerHTML = html;
+  document.getElementById('pageIndicator').textContent = 
+    `${currentNominationPage + 1}/${nominationsData.length}`;
+}
+
+function changeNominationPage(delta) {
+  currentNominationPage = Math.max(0, 
+    Math.min(nominationsData.length - 1, currentNominationPage + delta));
+  updateNominationDisplay();
+}
+
+function closeNominations() {
+  document.getElementById('nominationsOverlay').style.display = 'none';
+  document.getElementById('nominationsButton').style.display = 'none';
+}
+
+// Вспомогательные функции
+function getCupName(cupType) {
+  return {
+    bronze: 'Бронзового Кубка',
+    silver: 'Серебряного Кубка',
+    gold: 'Золотого Кубка'
+  }[cupType];
+}
+
+function getCupColor(cupType) {
+  return {
+    bronze: '#cd7f32',
+    silver: '#c0c0c0',
+    gold: '#ffd700'
+  }[cupType];
+}
+
+function getPositionName(position) {
+  return {
+    GK: 'Вратарь',
+    CDM: 'Защитник',
+    ST: 'Нападающий'
+  }[position];
+}
+
+function getRandomTeamFromCup(cupType) {
+  const teams = opponentTeams.filter(t => 
+    t.rating >= CUP_RANGES[cupType].min && 
+    t.rating <= CUP_RANGES[cupType].max
+  );
+  return teams[Math.floor(Math.random() * teams.length)].name;
+}
+
+function getRandomPlayerByPosition(position, minRating) {
+  const players = positions[position].players.filter(p => p.rating >= minRating);
+  return players[Math.floor(Math.random() * players.length)];
+}
+
+function getRandomPlayer(minRating = 0) {
+  const allPlayers = Object.values(positions).flatMap(p => p.players);
+  const filtered = allPlayers.filter(p => p.rating >= minRating);
+  return filtered[Math.floor(Math.random() * filtered.length)];
 }
 </script>
 
